@@ -3,16 +3,66 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Abhijeet Vardhan | Portfolio — Web Developer, AI Researcher & Future Founder</title>
-    <meta name="description" content="Portfolio of Abhijeet Vardhan — Analyst at HCLTech, Summer Intern at IIT Jammu, AI & Data Science Scholar at IIIT Delhi, and Computer Science Graduate from DU." />
+    <title>Abhijeet Vardhan | Portfolio — Analyst, AI Researcher & Software Developer</title>
+    <meta name="description" content="Portfolio of Abhijeet Vardhan — Analyst at HCLTech, Summer Intern at IIT Jammu, AI & Data Science Scholar at IIIT Delhi, and Computer Science Scholar." />
+    
+    <!-- OpenGraph Meta Tags (WhatsApp, LinkedIn, Facebook preview cards) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Abhijeet Vardhan | Portfolio — Analyst & AI Scholar" />
+    <meta property="og:description" content="Analyst @ HCLTech | Summer Intern @ IIT Jammu | AI & Data Science Scholar @ IIIT Delhi. Explore 12+ internships, research projects, and skills." />
+    <meta property="og:image" content="/abhijeet_avatar.png" />
+    <meta property="og:url" content="https://abhijeetvardhan.dev" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Abhijeet Vardhan | Portfolio" />
+    <meta name="twitter:description" content="Analyst @ HCLTech | Summer Intern @ IIT Jammu | AI & Data Science Scholar @ IIIT Delhi." />
+    <meta name="twitter:image" content="/abhijeet_avatar.png" />
+
+    <!-- Schema.org Person Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Abhijeet Vardhan",
+      "jobTitle": "Analyst",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "HCLTech"
+      },
+      "almaMater": [
+        "Indraprastha Institute of Information Technology Delhi",
+        "University of Delhi",
+        "IIT Jammu"
+      ],
+      "url": "https://abhijeetvardhan.dev",
+      "sameAs": [
+        "https://www.linkedin.com/in/abhijeetvardhan-98276222b",
+        "https://github.com/abhijeetvardhan"
+      ]
+    }
+    </script>
     
     <!-- Google Fonts: Manrope & DM Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Manrope:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Netlify Identity Widget for Decap CMS Authentication -->
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on("init", user => {
+          if (!user) {
+            window.netlifyIdentity.on("login", () => {
+              document.location.href = "/admin/";
+            });
+          }
+        });
+      }
+    </script>
   </body>
 </html>

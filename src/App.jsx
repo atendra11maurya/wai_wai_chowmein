@@ -1,294 +1,31 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import './index.css'
+import portfolioData from './config/portfolioData.json'
 
-const resumeData = {
-  name: 'Abhijeet Vardhan',
-  title: 'Analyst @ HCLTech | Summer Intern @ IIT Jammu | AI & Data Science Scholar @ IIIT Delhi',
-  location: 'New Delhi, Delhi, India',
-  email: 'abhijeetvardhan6881@gmail.com',
-  linkedin: 'https://www.linkedin.com/in/abhijeetvardhan-98276222b',
-  summary: `Enthusiastic and highly motivated individual with a diverse background in internships across various domains, including AI, blockchain, open source contribution, energy saving, and leadership. Passionate about tackling real-world challenges and finding innovative solutions through technology.`,
-
-  topSkills: [
-    'AI & Machine Learning',
-    'Python & Data Science',
-    'Web Development',
-    'Project Management',
-    'Blockchain Fundamentals',
-    'Energy Hybrid Systems',
-    'Healthcare Tech Projects',
-    'Open Source & Leadership'
-  ],
-
-  // Top Flagship Achievements shown on Landing Page ONLY
-  topAchievements: [
-    {
-      id: 'hcl',
-      title: 'HCLTech — Analyst (Graduate Trainee)',
-      badge: 'CAREER MILESTONE · NOIDA',
-      icon: '💼',
-      description: 'Gaining hands-on software development and IT services experience, building real-world applications, debugging, and collaborating with cross-functional technical teams.',
-      actionText: 'View Details ↗'
-    },
-    {
-      id: 'iit',
-      title: 'IIT Jammu & IIT Ropar Research Internships',
-      badge: 'TOP TIER RESEARCH',
-      icon: '🏛️',
-      description: 'Engaged in technical innovation at IIT Jammu (Career Development Services) and Energy Hybrid Systems research at iHub - AWaDH @ IIT Ropar.',
-      actionText: 'View Research ↗'
-    },
-    {
-      id: 'iiit',
-      title: 'IIIT Delhi AI & Data Science Scholar',
-      badge: 'POST-GRADUATE DIPLOMA',
-      icon: '🧠',
-      description: 'Post-Graduate research in Data Science in Health and Climate Change for Social Impact at Indraprastha Institute of Information Technology, Delhi.',
-      actionText: 'View Education ↗'
-    },
-    {
-      id: 'ai-health',
-      title: 'Breast Cancer Prediction using SVM (Healthcare AI)',
-      badge: 'FLAGSHIP PROJECT',
-      icon: '🩺',
-      description: 'Supervised Machine Learning classification model built with Python and Scikit-learn using Support Vector Machines (SVM) for diagnostic healthcare analysis.',
-      actionText: 'View Project ↗'
-    }
-  ],
-
-  certifications: [
-    { title: 'Product Matters 3.0', issuer: 'Industry Product Certification', icon: '📦', badge: 'PRODUCT STRATEGY & ROADMAPPING', desc: 'Product Strategy, roadmap planning, user research, and Agile product development frameworks.' },
-    { title: 'Generative AI for Everyone', issuer: 'DeepLearning.AI', icon: '🤖', badge: 'DEEPLEARNING.AI · GEN AI', desc: 'Foundations of Large Language Models (LLMs), prompt engineering techniques, AI ethics, and real-world GenAI deployment.' },
-    { title: 'Breast Cancer Prediction using SVM', issuer: 'Machine Learning Research', icon: '🩺', badge: 'SUPERVISED ML · HEALTHCARE AI', desc: 'Supervised Learning classification model using Support Vector Machines for clinical medical diagnostics.' },
-    { title: 'Strategy and Sustainability', issuer: 'Executive Certification', icon: '🌿', badge: 'SUSTAINABLE TECH & ESG', desc: 'Sustainable business practices, ESG strategies, and eco-friendly technology implementation.' },
-    { title: 'Global Environmental Management', issuer: 'International Certification', icon: '🌍', badge: 'ENVIRONMENTAL POLICY', desc: 'Environmental policy, clean energy transition, and global sustainability systems monitoring.' }
-  ],
-
-  experiences: [
-    {
-      id: 1,
-      role: 'Analyst (Graduate Trainee)',
-      company: 'HCLTech',
-      location: 'Noida, India',
-      period: 'July 2025 – Present',
-      category: 'work',
-      icon: '💼',
-      details: [
-        'Joined HCLTech as a Graduate Trainee gaining hands-on experience in software development and IT services.',
-        'Worked on real-world projects involving application development, debugging, and software maintenance.',
-        'Collaborated with cross-functional teams to enhance technical and problem-solving skills.'
-      ],
-      tags: ['Software Dev', 'IT Services', 'App Development', 'Debugging']
-    },
-    {
-      id: 2,
-      role: 'Artificial Intelligence Intern',
-      company: 'Sabudh Foundation',
-      location: 'Delhi, India',
-      period: 'January 2025 – June 2025',
-      category: 'ai',
-      icon: '🧠',
-      details: [
-        'Executed Machine Learning models and data science algorithms for social impact applications.',
-        'Analyzed data pipelines, model optimization, and feature engineering for AI solutions.'
-      ],
-      tags: ['AI', 'Machine Learning', 'Data Science', 'Python']
-    },
-    {
-      id: 3,
-      role: 'Python & Machine Learning Intern',
-      company: 'Training and Placement Cell, Department of Management, IGDTUW',
-      location: 'Delhi, India',
-      period: 'June 2024 – July 2024',
-      category: 'ai',
-      icon: '🎓',
-      details: [
-        'Successfully completed intensive 8-week Summer Internship program on Python and Machine Learning.',
-        'Demonstrated exemplary dedication, hands-on algorithm implementation, and predictive modeling.'
-      ],
-      tags: ['Python', 'ML Algorithms', 'Predictive Modeling']
-    },
-    {
-      id: 4,
-      role: 'Summer Intern',
-      company: 'Career Development Services, IIT Jammu',
-      location: 'Jammu & Kashmir, India',
-      period: 'May 2024 – July 2024',
-      category: 'research',
-      icon: '🏛️',
-      details: [
-        'Engaged in technical research projects, campus development initiatives, and skill mentorship at IIT Jammu.'
-      ],
-      tags: ['IIT Jammu', 'Research', 'Tech Innovation']
-    },
-    {
-      id: 5,
-      role: 'Intern',
-      company: 'your-space',
-      location: 'Delhi, India',
-      period: 'April 2024 – June 2024',
-      category: 'work',
-      icon: '🏢',
-      details: [
-        'Contributed to operational workflows, digital asset management, and student housing platform services.'
-      ],
-      tags: ['Operations', 'Platform Management', 'Growth']
-    },
-    {
-      id: 6,
-      role: 'Campus Ambassador',
-      company: 'GUVI Geek Networks, IITM Research Park',
-      location: 'Chennai, Tamil Nadu, India',
-      period: 'September 2023 – December 2023',
-      category: 'leadership',
-      icon: '🚀',
-      details: [
-        'Promoted GUVI tech courses and upskilling programs to fellow students to foster tech skill growth.',
-        'Organized webinars, student outreach, and career development initiatives in collaboration with IITM Research Park.'
-      ],
-      tags: ['IITM Research Park', 'Tech Ambassador', 'Student Outreach']
-    },
-    {
-      id: 7,
-      role: 'Campus Ambassador',
-      company: "IIM Bangalore's Vista",
-      location: 'India',
-      period: 'June 2023 – August 2023',
-      category: 'leadership',
-      icon: '🌟',
-      details: [
-        "Led campus marketing and student engagement for IIM Bangalore's flagship annual business fest Vista."
-      ],
-      tags: ['IIM Bangalore', 'Marketing', 'Leadership']
-    },
-    {
-      id: 8,
-      role: 'Blockchain Intern',
-      company: 'IEEE IGDTUW',
-      location: 'Delhi, India',
-      period: 'June 2023 – July 2023',
-      category: 'research',
-      icon: '⛓️',
-      details: [
-        'Researched decentralized ledgers, smart contracts, and cryptographic security protocols under IEEE student chapter.'
-      ],
-      tags: ['Blockchain', 'IEEE', 'Smart Contracts']
-    },
-    {
-      id: 9,
-      role: 'Energy Hybrid System Research Intern',
-      company: 'iHub - AWaDH @ IIT Ropar',
-      location: 'Delhi / Ropar, India',
-      period: 'May 2023 – July 2023',
-      category: 'research',
-      icon: '⚡',
-      details: [
-        'Completed research internship on Energy Hybrid Systems at IIT Ropar iHub AWaDH.',
-        'Gained hands-on skills in clean energy monitoring, hardware-software integration, and sustainable tech.'
-      ],
-      tags: ['IIT Ropar', 'Energy Hybrid Systems', 'Clean Tech']
-    },
-    {
-      id: 10,
-      role: 'Web Developer',
-      company: 'Code Alpha',
-      location: 'India',
-      period: 'March 2023 – April 2023',
-      category: 'work',
-      icon: '💻',
-      details: [
-        'Designed, recommended, and pitched website feature improvements for existing and new platforms.',
-        'Troubleshot bugs in web-based applications and provided technical support for web systems.'
-      ],
-      tags: ['Web Development', 'Frontend UI', 'Debugging', 'Tech Support']
-    },
-    {
-      id: 11,
-      role: 'Project Intern',
-      company: 'E-Cell NITK',
-      location: 'India',
-      period: 'December 2022 – January 2023',
-      category: 'leadership',
-      icon: '💡',
-      details: [
-        'Supported startup pitch decks, incubation events, and entrepreneurship initiatives at NITK Surathkal E-Cell.'
-      ],
-      tags: ['E-Cell NITK', 'Entrepreneurship', 'Project Planning']
-    },
-    {
-      id: 12,
-      role: 'Fresher Ambassador',
-      company: 'Mood Indigo IIT Bombay',
-      location: 'India',
-      period: 'September 2022 – November 2022',
-      category: 'leadership',
-      icon: '🎨',
-      details: [
-        'Represented Asia\'s largest college cultural festival Mood Indigo IIT Bombay across Delhi university circuits.'
-      ],
-      tags: ['IIT Bombay', 'Mood Indigo', 'Public Relations']
-    }
-  ],
-
-  education: [
-    {
-      badge: 'POSTGRADUATE DIPLOMA · IIIT DELHI',
-      degree: 'Post-Graduate Diploma in Data Science in Health & Climate Change for Social Impact',
-      field: 'AI & DATA SCIENCE RESEARCH',
-      institution: 'Indraprastha Institute of Information Technology (IIIT), Delhi',
-      period: 'August 2025 – August 2026',
-      desc: 'Specialized postgraduate research program integrating Machine Learning models, health data analytics, predictive epidemiology, and climate impact forecasting.'
-    },
-    {
-      badge: 'BACHELOR DEGREE · UNIVERSITY OF DELHI',
-      degree: "Bachelor's Degree in Computer Science",
-      field: 'B.Sc. COMPUTER SCIENCE',
-      institution: 'University of Delhi',
-      period: 'June 2022 – June 2026',
-      desc: 'Foundational degree coursework covering Data Structures & Algorithms, Object-Oriented Programming, Database Management Systems, Web Development, and Software Engineering.'
-    }
-  ],
-
-  projects: [
-    {
-      title: 'Breast Cancer Prediction using Support Vector Machines',
-      category: 'AI & Healthcare ML Project',
-      desc: 'Supervised Machine Learning classification pipeline built with Python and Scikit-learn using Support Vector Classifier (SVC) to detect malignant tumors with high statistical accuracy.',
-      icon: '🩺',
-      badge: 'HEALTHCARE AI'
-    },
-    {
-      title: 'Energy Hybrid System Research @ IIT Ropar AWaDH',
-      category: 'Clean Energy & IoT Systems',
-      desc: 'Research project analyzing hybrid renewable energy grids, battery management systems, and IoT data telemetry for clean energy conversion.',
-      icon: '⚡',
-      badge: 'IIT ROPAR RESEARCH'
-    },
-    {
-      title: 'Full-Stack Web & Debugging Architecture @ Code Alpha & HCLTech',
-      category: 'Web Development & Application Engineering',
-      desc: 'Responsive web applications engineered with modern JavaScript frameworks, API integrations, and robust debugging tools for client services.',
-      icon: '🌐',
-      badge: 'FULL-STACK WEB'
-    },
-    {
-      title: 'Pan-India Student Upskilling & Ambassador Programs',
-      category: 'Tech Outreach & Community Leadership',
-      desc: 'Organized tech skill initiatives reaching over 1k+ students across GUVI IITM Research Park, IIM Bangalore Vista, and IEEE IGDTUW.',
-      icon: '👥',
-      badge: 'COMMUNITY & LEADERSHIP'
-    }
-  ]
-}
-
-function Dialog({ name, customData, onClose }) {
+function Dialog({ customData, onClose }) {
   const [copied, setCopied] = useState(false)
+  const [formSent, setFormSent] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(resumeData.email)
+    navigator.clipboard.writeText(portfolioData.personal.email)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault()
+    // Open mailto fallback or submit
+    const mailtoUrl = `mailto:${portfolioData.personal.email}?subject=Contact from Portfolio by ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(formData.message + '\n\nSender Email: ' + formData.email)}`
+    window.open(mailtoUrl, '_blank')
+    setFormSent(true)
+    setTimeout(() => {
+      setFormSent(false)
+      onClose()
+    }, 2500)
+  }
+
+  const whatsappUrl = `https://wa.me/${portfolioData.personal.whatsappNumber}?text=${encodeURIComponent(portfolioData.personal.whatsappMessage)}`
 
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
@@ -301,20 +38,65 @@ function Dialog({ name, customData, onClose }) {
       >
         <p className="eyebrow">{customData?.eyebrow || 'Connect & Collaborate'}</p>
         <h2 id="dialog-title">{customData?.title || 'Get in touch.'}</h2>
-        <p>{customData?.text || `Feel free to reach out to Abhijeet Vardhan for software development opportunities, AI projects, or research collaborations.`}</p>
+        <p>{customData?.text || `Feel free to reach out to ${portfolioData.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
 
-        <div style={{ marginTop: '16px', background: 'rgba(2, 132, 199, 0.06)', padding: '14px', borderRadius: '16px', border: '1px solid rgba(2, 132, 199, 0.15)' }}>
-          <p style={{ margin: '0 0 6px', fontSize: '12px', fontWeight: '700', color: '#0284c7', fontFamily: 'DM Mono, monospace' }}>DIRECT EMAIL</p>
-          <p style={{ margin: 0, fontWeight: '700', color: '#0a2540', fontSize: '15px' }}>{resumeData.email}</p>
+        {/* Quick WhatsApp Action Button */}
+        <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <a
+            className="pill whatsapp"
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ width: '100%', justifyContent: 'center', textAlign: 'center', fontSize: '15px' }}
+          >
+            💬 Chat instantly on WhatsApp ↗
+          </a>
         </div>
 
-        <div className="modal-row">
+        {/* Interactive Direct Message Form */}
+        <form className="contact-form" onSubmit={handleFormSubmit}>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="Your Name"
+            required
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+          />
+          <input
+            type="email"
+            className="form-input"
+            placeholder="Your Email"
+            required
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          />
+          <textarea
+            className="form-textarea"
+            rows="3"
+            placeholder="Your Message..."
+            required
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+          ></textarea>
+
+          <button type="submit" className="pill primary" style={{ width: '100%', justifyContent: 'center' }}>
+            {formSent ? '✓ Opening Email Client...' : 'Send Message ✉️'}
+          </button>
+        </form>
+
+        <div style={{ marginTop: '16px', background: 'rgba(2, 132, 199, 0.06)', padding: '14px', borderRadius: '16px', border: '1px solid rgba(2, 132, 199, 0.15)' }}>
+          <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: '700', color: '#0284c7', fontFamily: 'DM Mono, monospace' }}>DIRECT EMAIL</p>
+          <p style={{ margin: 0, fontWeight: '700', color: '#0a2540', fontSize: '14.5px' }}>{portfolioData.personal.email}</p>
+        </div>
+
+        <div className="modal-row" style={{ marginTop: '16px' }}>
           <button className="pill primary" onClick={handleCopyEmail}>
-            {copied ? '✓ Email Copied!' : 'Copy Email 📋'}
+            {copied ? '✓ Copied!' : 'Copy Email 📋'}
           </button>
           <a
             className="pill linkedin"
-            href={resumeData.linkedin}
+            href={portfolioData.personal.linkedin}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -349,24 +131,27 @@ export default function App() {
   }
 
   const filteredExperiences = filter === 'all'
-    ? resumeData.experiences
-    : resumeData.experiences.filter(exp => exp.category === filter)
+    ? portfolioData.experiences
+    : portfolioData.experiences.filter(exp => exp.category === filter)
+
+  const whatsappUrl = `https://wa.me/${portfolioData.personal.whatsappNumber}?text=${encodeURIComponent(portfolioData.personal.whatsappMessage)}`
 
   return (
     <div className="shell min-h-screen">
       {/* Translucent Glass Navigation Bar */}
       <nav className="glass navbar">
         <a className="brand" href="#home" onClick={(e) => { e.preventDefault(); navigateToTab('home'); }}>
-          <div className="brand-avatar">AV</div>
-          <span>abhijeet<span className="brand-accent">.</span>v</span>
+          <div className="brand-avatar">{portfolioData.personal.avatarInitials}</div>
+          <span>{portfolioData.personal.shortName.split('.')[0]}<span className="brand-accent">.</span>{portfolioData.personal.shortName.split('.')[1] || 'v'}</span>
         </a>
 
         <div className="nav-links">
           <button className={`pill ${activeTab === 'home' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('home')}>Home</button>
-          <button className={`pill ${activeTab === 'experience' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('experience')}>Experience ({resumeData.experiences.length})</button>
-          <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({resumeData.projects.length})</button>
-          <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({resumeData.education.length})</button>
+          <button className={`pill ${activeTab === 'experience' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('experience')}>Experience ({portfolioData.experiences.length})</button>
+          <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
+          <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
+          <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
 
@@ -383,10 +168,11 @@ export default function App() {
 
         <div className={`nav-menu-drawer glass ${isMenuOpen ? 'open' : ''}`}>
           <button className={`pill ${activeTab === 'home' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('home')}>Home</button>
-          <button className={`pill ${activeTab === 'experience' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('experience')}>Experience ({resumeData.experiences.length})</button>
-          <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({resumeData.projects.length})</button>
-          <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({resumeData.education.length})</button>
+          <button className={`pill ${activeTab === 'experience' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('experience')}>Experience ({portfolioData.experiences.length})</button>
+          <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
+          <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
+          <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>Download CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
       </nav>
@@ -399,16 +185,18 @@ export default function App() {
             <section className="hero glass">
               <div className="hero-content-layout">
                 <div className="hero-text-block">
-                  <h1 className="hero-name">Abhijeet Vardhan</h1>
+                  <h1 className="hero-name">{portfolioData.personal.name}</h1>
                   <div className="hero-role-title">
-                    <span>Analyst @ HCLTech</span>
+                    <span>{portfolioData.personal.title}</span>
                   </div>
                   <div className="hero-bio">
-                    {/* Space reserved for custom bio text */}
+                    <p style={{ margin: '14px 0 0', color: '#475569', fontSize: '15px', lineHeight: '1.65' }}>
+                      {portfolioData.personal.summary}
+                    </p>
                   </div>
                 </div>
                 <div className="hero-avatar-wrapper">
-                  <img src="/abhijeet_avatar.png" alt="Abhijeet Vardhan 3D Avatar" className="hero-avatar-3d" />
+                  <img src={portfolioData.personal.avatarImage} alt={`${portfolioData.personal.name} Avatar`} className="hero-avatar-3d" />
                 </div>
               </div>
             </section>
@@ -416,16 +204,34 @@ export default function App() {
             {/* Standalone Equal Full-Width Hero Action Buttons */}
             <div className="hero-actions-standalone">
               <button className="pill hero-primary-btn" onClick={() => navigateToTab('experience')}>Explore 12+ Experiences →</button>
-              <a className="pill linkedin" href={resumeData.linkedin} target="_blank" rel="noopener noreferrer">
-                Connect on LinkedIn ↗
+              <a className="pill whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                WhatsApp Chat 💬
+              </a>
+              <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                Download Resume PDF 📥
+              </a>
+              <a className="pill linkedin" href={portfolioData.personal.linkedin} target="_blank" rel="noopener noreferrer">
+                LinkedIn ↗
               </a>
               <button className="pill glass" onClick={() => openDialog()}>
                 Get in Touch ✉️
               </button>
             </div>
 
+            {/* Impact Metrics Grid Counter */}
+            <section className="metrics-section">
+              <div className="metrics-grid">
+                {portfolioData.impactMetrics.map((metric, idx) => (
+                  <div key={idx} className="metric-card glass">
+                    <div className="metric-value">{metric.value}</div>
+                    <div className="metric-label">{metric.label}</div>
+                    <div className="metric-subtext">{metric.subtext}</div>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-            {/* LANDING PAGE EXCLUSIVE: Biggest Achievements Spotlight (.fest-container-card glass) */}
+            {/* LANDING PAGE EXCLUSIVE: Biggest Achievements Spotlight */}
             <section className="fest-container-card glass">
               <div className="fest-header">
                 <div className="fest-header-top">
@@ -439,7 +245,7 @@ export default function App() {
               </div>
 
               <div className="fest-sub-rows">
-                {resumeData.topAchievements.map((item) => (
+                {portfolioData.topAchievements.map((item) => (
                   <div
                     key={item.id}
                     className="fest-row-card glass"
@@ -477,8 +283,34 @@ export default function App() {
               </div>
             </section>
 
+            {/* Social Proof & Testimonials Section */}
+            <section className="fest-container-card glass" style={{ marginTop: '32px' }}>
+              <div className="fest-header">
+                <div className="fest-header-top">
+                  <span className="fest-eyebrow-badge">RECOMMENDATIONS & FEEDBACK</span>
+                  <span className="badge-tag accent">VERIFIED SOCIAL PROOF</span>
+                </div>
+                <h2>What Mentors & Leaders Say</h2>
+              </div>
+
+              <div className="testimonials-grid">
+                {portfolioData.testimonials.map((item, idx) => (
+                  <div key={idx} className="testimonial-card glass">
+                    <div className="testimonial-quote">"{item.quote}"</div>
+                    <div className="testimonial-author">
+                      <div className="testimonial-avatar">{item.avatar}</div>
+                      <div className="testimonial-info">
+                        <h4>{item.author}</h4>
+                        <p>{item.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
             {/* Call to Action Banner on Home */}
-            <section className="wide glass">
+            <section className="wide glass" style={{ marginTop: '32px' }}>
               <div>
                 <p className="eyebrow">Explore Complete Track Record</p>
                 <h2>Check out all 12+ roles, projects, and certifications.</h2>
@@ -498,15 +330,15 @@ export default function App() {
               <button className="pill glass" style={{ width: 'fit-content', marginBottom: '16px' }} onClick={() => navigateToTab('home')}>
                 ← Back to Home
               </button>
-              <p className="eyebrow">Professional Track Record · 12 Roles</p>
+              <p className="eyebrow">Professional Track Record · {portfolioData.experiences.length} Roles</p>
               <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Work & Research Internships.</h1>
               <p className="intro" style={{ marginTop: '12px' }}>
-                Complete breakdown of my 12 internships, software engineering positions, IIT research projects, and campus ambassador roles.
+                Complete breakdown of my internships, software engineering positions, IIT research projects, and campus ambassador roles.
               </p>
 
               <div className="filter-bar">
                 <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>
-                  All Experience ({resumeData.experiences.length})
+                  All Experience ({portfolioData.experiences.length})
                 </button>
                 <button className={`filter-btn ${filter === 'work' ? 'active' : ''}`} onClick={() => setFilter('work')}>
                   Industry & Dev Roles (3)
@@ -546,7 +378,7 @@ export default function App() {
                     </h2>
                     <div className="trajectory-institution">📍 {exp.location}</div>
 
-                    <ul style={{ margin: '0 0 16px', paddingLeft: '20px', color: '#cbd5e1', fontSize: '14px', lineHeight: '1.65' }}>
+                    <ul style={{ margin: '0 0 16px', paddingLeft: '20px', color: '#475569', fontSize: '14px', lineHeight: '1.65' }}>
                       {exp.details.map((point, pIdx) => (
                         <li key={pIdx} style={{ marginBottom: '4px' }}>{point}</li>
                       ))}
@@ -580,19 +412,32 @@ export default function App() {
 
             <div className="fest-container-card glass" style={{ marginTop: '24px' }}>
               <div className="fest-sub-rows">
-                {resumeData.projects.map((proj, idx) => (
-                  <div key={idx} className="fest-row-card glass" onClick={() => openDialog({ eyebrow: proj.badge, title: proj.title, text: proj.desc })}>
+                {portfolioData.projects.map((proj, idx) => (
+                  <div key={idx} className="fest-row-card glass">
                     <div className="row-card-content">
                       <span className="row-card-icon">{proj.icon}</span>
                       <div className="row-card-info">
                         <span className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }}>{proj.badge}</span>
                         <h3>{proj.title}</h3>
                         <p>{proj.desc}</p>
+
+                        <div className="project-action-buttons">
+                          {proj.liveUrl && (
+                            <a className="project-btn primary" href={proj.liveUrl} target="_blank" rel="noopener noreferrer">
+                              Live Demo ↗
+                            </a>
+                          )}
+                          {proj.githubUrl && (
+                            <a className="project-btn secondary" href={proj.githubUrl} target="_blank" rel="noopener noreferrer">
+                              Source Code ↗
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </div>
                     <div className="row-card-action">
-                      <button className="pill primary row-action-btn" onClick={(e) => { e.stopPropagation(); openDialog({ eyebrow: proj.badge, title: proj.title, text: proj.desc }); }}>
-                        Project Details ↗
+                      <button className="pill primary row-action-btn" onClick={() => openDialog({ eyebrow: proj.badge, title: proj.title, text: proj.desc })}>
+                        Details ↗
                       </button>
                     </div>
                   </div>
@@ -617,11 +462,11 @@ export default function App() {
             </header>
 
             <div className="trajectory-wrapper">
-              {resumeData.education.map((edu, idx) => (
+              {portfolioData.education.map((edu, idx) => (
                 <div key={idx} className="trajectory-step-container">
                   <div className="trajectory-node-column">
                     <div className="trajectory-dot"></div>
-                    {idx < resumeData.education.length - 1 && <div className="trajectory-line"></div>}
+                    {idx < portfolioData.education.length - 1 && <div className="trajectory-line"></div>}
                   </div>
 
                   <div className="trajectory-card glass">
@@ -659,13 +504,12 @@ export default function App() {
             </header>
 
             <div style={{ marginTop: '24px' }}>
-
               <div className="trajectory-wrapper" style={{ marginTop: '28px' }}>
-                {resumeData.certifications.map((cert, idx) => (
+                {portfolioData.certifications.map((cert, idx) => (
                   <div key={idx} className="trajectory-step-container">
                     <div className="trajectory-node-column">
                       <div className="trajectory-dot"></div>
-                      {idx < resumeData.certifications.length - 1 && <div className="trajectory-line"></div>}
+                      {idx < portfolioData.certifications.length - 1 && <div className="trajectory-line"></div>}
                     </div>
 
                     <div
@@ -698,14 +542,13 @@ export default function App() {
 
       {/* Footer */}
       <footer>
-        <span>© 2026 ABHIJEET VARDHAN · NEW DELHI, INDIA</span>
+        <span>© 2026 {portfolioData.personal.name.toUpperCase()} · {portfolioData.personal.location.toUpperCase()}</span>
         <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
       </footer>
 
       {/* Contact Dialog */}
       {activeDialog && (
         <Dialog
-          name={activeDialog}
           customData={customDialogData}
           onClose={() => setActiveDialog(null)}
         />
