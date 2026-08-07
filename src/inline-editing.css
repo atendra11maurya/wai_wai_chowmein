@@ -25,6 +25,7 @@
   display: inline-block;
   resize: both;
   overflow: hidden;
+  position: relative;
 }
 .editable-text:hover {
   outline-color: #3b82f6;

@@ -1,5 +1,53 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+function TopLeftResizer({ targetRef }) {
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const target = targetRef.current;
+    if (!target) return;
+    
+    const startWidth = target.offsetWidth;
+    const startHeight = target.offsetHeight;
+
+    const handleMouseMove = (moveEvent) => {
+      const dx = startX - moveEvent.clientX;
+      const dy = startY - moveEvent.clientY;
+      target.style.width = `${startWidth + dx}px`;
+      target.style.height = `${startHeight + dy}px`;
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  return (
+    <div
+      contentEditable={false}
+      onMouseDown={handleMouseDown}
+      style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '10px',
+        height: '10px',
+        background: '#3b82f6',
+        cursor: 'nwse-resize',
+        zIndex: 10,
+        transform: 'translate(-50%, -50%)',
+        borderRadius: '50%'
+      }}
+    />
+  );
+}
+
 export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, className, style, placeholder, ...props }) {
   const elemRef = useRef(null);
   
@@ -36,6 +84,7 @@ export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, c
       data-placeholder={placeholder}
       {...props}
     >
+      {isEditMode && <TopLeftResizer targetRef={elemRef} />}
       {value}
     </Tag>
   );
@@ -44,6 +93,7 @@ export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, c
 export function EditableImage({ src, alt, className, style, onChange, isEditMode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputVal, setInputVal] = useState(src);
+  const wrapperRef = useRef(null);
 
   useEffect(() => {
     setInputVal(src);
@@ -65,7 +115,8 @@ export function EditableImage({ src, alt, className, style, onChange, isEditMode
   };
 
   return (
-    <div className={`editable-img-wrapper ${isEditMode ? 'editable-hover' : ''}`} style={{ position: 'relative', display: 'inline-block', ...style }}>
+    <div ref={wrapperRef} className={`editable-img-wrapper ${isEditMode ? 'editable-hover' : ''}`} style={{ position: 'relative', display: 'inline-block', ...style }}>
+      {isEditMode && <TopLeftResizer targetRef={wrapperRef} />}
       <img 
         src={src} 
         alt={alt} 
@@ -132,8 +183,8 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
         href={!isEditMode ? href : undefined} 
         className={`${className || ''} ${isEditMode ? 'editable-hover' : ''}`} 
         style={style} 
-        onClick={handleClick}
         {...props}
+        onClick={handleClick}
       >
         {text || children}
       </Component>
