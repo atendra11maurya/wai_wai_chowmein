@@ -1255,3 +1255,151 @@ footer {
   border-color: #0284c7;
   box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
 }
+
+/* ── Admin Dashboard Styles ──────────────────────── */
+.admin-section {
+  border-radius: 24px;
+  padding: 24px 28px;
+  overflow: hidden;
+}
+.admin-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+.admin-section-title {
+  font-size: clamp(18px, 2.5vw, 22px);
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0;
+}
+.admin-section-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 4px 0 0;
+}
+.admin-count {
+  color: #64748b;
+  font-weight: 600;
+}
+.admin-section-body {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.admin-card {
+  border-radius: 18px;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+.admin-card:hover {
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+.admin-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  gap: 12px;
+  user-select: none;
+}
+.admin-card-title {
+  display: flex;
+  align-items: center;
+  font-weight: 750;
+  font-size: 15px;
+  color: #0f172a;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.admin-card-body {
+  padding: 0 20px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.admin-chevron {
+  font-size: 12px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.admin-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+.admin-delete-btn {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 10px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+.admin-delete-btn:hover {
+  background: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+.admin-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.06);
+  border: 1px dashed rgba(2, 132, 199, 0.3);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: fit-content;
+}
+.admin-add-btn:hover {
+  background: rgba(2, 132, 199, 0.14);
+  border-color: rgba(2, 132, 199, 0.6);
+}
+.admin-sticky-save {
+  position: sticky;
+  bottom: 16px;
+  margin-top: 24px;
+  padding: 16px 24px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(15, 23, 42, 0.1);
+  box-shadow: 0 -8px 30px rgba(15, 23, 42, 0.1);
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  z-index: 5;
+}
+@media (max-width: 640px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+  .admin-sticky-save {
+    flex-direction: column;
+  }
+}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './index.css'
 import defaultPortfolioData from './config/portfolioData.json'
+import AdminDashboard from './AdminDashboard'
 
 function Dialog({ customData, onClose, data }) {
   const [copied, setCopied] = useState(false)
@@ -39,7 +40,6 @@ function Dialog({ customData, onClose, data }) {
         <h2 id="dialog-title">{customData?.title || 'Get in touch.'}</h2>
         <p>{customData?.text || `Feel free to reach out to ${data.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
 
-        {/* Quick WhatsApp Action Button */}
         <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
           <a
             className="pill whatsapp"
@@ -52,33 +52,10 @@ function Dialog({ customData, onClose, data }) {
           </a>
         </div>
 
-        {/* Interactive Direct Message Form */}
         <form className="contact-form" onSubmit={handleFormSubmit}>
-          <input
-            type="text"
-            className="form-input"
-            placeholder="Your Name"
-            required
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-          <input
-            type="email"
-            className="form-input"
-            placeholder="Your Email"
-            required
-            value={formData.email}
-            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          />
-          <textarea
-            className="form-textarea"
-            rows="3"
-            placeholder="Your Message..."
-            required
-            value={formData.message}
-            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          ></textarea>
-
+          <input type="text" className="form-input" placeholder="Your Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
+          <input type="email" className="form-input" placeholder="Your Email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+          <textarea className="form-textarea" rows="3" placeholder="Your Message..." required value={formData.message} onChange={(e) => setFormData({ ...formData, message: e.target.value })}></textarea>
           <button type="submit" className="pill primary" style={{ width: '100%', justifyContent: 'center' }}>
             {formSent ? '✓ Opening Email Client...' : 'Send Message ✉️'}
           </button>
@@ -90,191 +67,12 @@ function Dialog({ customData, onClose, data }) {
         </div>
 
         <div className="modal-row" style={{ marginTop: '16px' }}>
-          <button className="pill primary" onClick={handleCopyEmail}>
-            {copied ? '✓ Copied!' : 'Copy Email 📋'}
-          </button>
-          <a
-            className="pill linkedin"
-            href={data.personal.linkedin}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            LinkedIn ↗
-          </a>
-          <button className="pill glass" onClick={onClose}>
-            Close
-          </button>
+          <button className="pill primary" onClick={handleCopyEmail}>{copied ? '✓ Copied!' : 'Copy Email 📋'}</button>
+          <a className="pill linkedin" href={data.personal.linkedin} target="_blank" rel="noopener noreferrer">LinkedIn ↗</a>
+          <button className="pill glass" onClick={onClose}>Close</button>
         </div>
       </section>
     </div>
-  )
-}
-
-function AdminDashboard({ portfolioData, onSave, onLogout }) {
-  const [formData, setFormData] = useState(portfolioData)
-  const [saveSuccess, setSaveSuccess] = useState(false)
-
-  const handlePersonalChange = (field, val) => {
-    setFormData({
-      ...formData,
-      personal: {
-        ...formData.personal,
-        [field]: val
-      }
-    })
-  }
-
-  const handleSave = () => {
-    onSave(formData)
-    setSaveSuccess(true)
-    setTimeout(() => setSaveSuccess(false), 3000)
-  }
-
-  const handleDownloadJSON = () => {
-    const jsonStr = JSON.stringify(formData, null, 2)
-    const blob = new Blob([jsonStr], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'portfolioData.json'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  return (
-    <section className="events-page">
-      <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <p className="eyebrow">🔐 Admin Content Manager (Vercel Native)</p>
-            <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 48px)', margin: '6px 0' }}>Website Admin Panel</h1>
-            <p className="intro" style={{ margin: 0 }}>
-              Edit personal details, WhatsApp number, email, links, and content below.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button className="pill primary" onClick={handleSave}>
-              {saveSuccess ? '✓ Saved Live!' : '💾 Save & Apply'}
-            </button>
-            <button className="pill glass" onClick={handleDownloadJSON}>
-              📥 Export JSON
-            </button>
-            <button className="pill glass" onClick={onLogout} style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}>
-              🔒 Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Admin Form Grid */}
-      <div className="fest-container-card glass" style={{ marginTop: '24px', padding: '28px' }}>
-        <h3 style={{ fontSize: '20px', margin: '0 0 20px', color: '#0f172a' }}>👤 Personal & Brand Settings</h3>
-
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Full Name</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.name}
-              onChange={(e) => handlePersonalChange('name', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Short Name (Navbar)</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.shortName}
-              onChange={(e) => handlePersonalChange('shortName', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Email Address</label>
-            <input
-              type="email"
-              className="form-input"
-              value={formData.personal.email}
-              onChange={(e) => handlePersonalChange('email', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>WhatsApp Number (e.g. 919876543210)</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.whatsappNumber}
-              onChange={(e) => handlePersonalChange('whatsappNumber', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>LinkedIn URL</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.linkedin}
-              onChange={(e) => handlePersonalChange('linkedin', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>GitHub URL</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.github}
-              onChange={(e) => handlePersonalChange('github', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Resume File URL</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.resumeUrl}
-              onChange={(e) => handlePersonalChange('resumeUrl', e.target.value)}
-            />
-          </div>
-          <div>
-            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Admin Password</label>
-            <input
-              type="text"
-              className="form-input"
-              value={formData.personal.adminPassword || 'admin123'}
-              onChange={(e) => handlePersonalChange('adminPassword', e.target.value)}
-            />
-          </div>
-        </div>
-
-        <div style={{ marginTop: '16px' }}>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Title & Tagline</label>
-          <input
-            type="text"
-            className="form-input"
-            value={formData.personal.title}
-            onChange={(e) => handlePersonalChange('title', e.target.value)}
-          />
-        </div>
-
-        <div style={{ marginTop: '16px' }}>
-          <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Summary / Bio</label>
-          <textarea
-            className="form-textarea"
-            rows="4"
-            value={formData.personal.summary}
-            onChange={(e) => handlePersonalChange('summary', e.target.value)}
-          ></textarea>
-        </div>
-
-        <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
-          <button className="pill primary" onClick={handleSave}>
-            {saveSuccess ? '✓ Saved Live!' : '💾 Save Changes'}
-          </button>
-          <button className="pill glass" onClick={handleDownloadJSON}>
-            📥 Export Updated JSON File
-          </button>
-        </div>
-      </div>
-    </section>
   )
 }
 
