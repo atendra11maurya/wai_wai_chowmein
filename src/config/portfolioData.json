@@ -1,6 +1,6 @@
 {
   "personal": {
-    "name": "Abhijeet Vardhan",
+    "name": "Abhi!jeet Vardhan",
     "shortName": "abhijeet.v",
     "avatarInitials": "AV",
     "avatarImage": "/abhijeet_avatar.png",
@@ -19,10 +19,26 @@
     "contactText": "Feel free to reach out to Abhijeet Vardhan for software development opportunities, AI projects, or research collaborations."
   },
   "impactMetrics": [
-    { "label": "Experience Roles", "value": "12+", "subtext": "Internships & Corporate" },
-    { "label": "Premier Institutions", "value": "3+", "subtext": "IIT Jammu, IIT Ropar & IIIT Delhi" },
-    { "label": "Flagship Projects", "value": "4+", "subtext": "Healthcare AI & Web Tech" },
-    { "label": "Students Mentored", "value": "1,000+", "subtext": "Across Ambassador Programs" }
+    {
+      "label": "Experience Roles",
+      "value": "12+",
+      "subtext": "Internships & Corporate"
+    },
+    {
+      "label": "Premier Institutions",
+      "value": "3+",
+      "subtext": "IIT Jammu, IIT Ropar & IIIT Delhi"
+    },
+    {
+      "label": "Flagship Projects",
+      "value": "4+",
+      "subtext": "Healthcare AI & Web Tech"
+    },
+    {
+      "label": "Students Mentored",
+      "value": "1,000+",
+      "subtext": "Across Ambassador Programs"
+    }
   ],
   "topSkills": [
     "AI & Machine Learning",
@@ -89,11 +105,41 @@
     }
   ],
   "certifications": [
-    { "title": "Product Matters 3.0", "issuer": "Industry Product Certification", "icon": "📦", "badge": "PRODUCT STRATEGY & ROADMAPPING", "desc": "Product Strategy, roadmap planning, user research, and Agile product development frameworks." },
-    { "title": "Generative AI for Everyone", "issuer": "DeepLearning.AI", "icon": "🤖", "badge": "DEEPLEARNING.AI · GEN AI", "desc": "Foundations of Large Language Models (LLMs), prompt engineering techniques, AI ethics, and real-world GenAI deployment." },
-    { "title": "Breast Cancer Prediction using SVM", "issuer": "Machine Learning Research", "icon": "🩺", "badge": "SUPERVISED ML · HEALTHCARE AI", "desc": "Supervised Learning classification model using Support Vector Machines for clinical medical diagnostics." },
-    { "title": "Strategy and Sustainability", "issuer": "Executive Certification", "icon": "🌿", "badge": "SUSTAINABLE TECH & ESG", "desc": "Sustainable business practices, ESG strategies, and eco-friendly technology implementation." },
-    { "title": "Global Environmental Management", "issuer": "International Certification", "icon": "🌍", "badge": "ENVIRONMENTAL POLICY", "desc": "Environmental policy, clean energy transition, and global sustainability systems monitoring." }
+    {
+      "title": "Product Matters 3.0",
+      "issuer": "Industry Product Certification",
+      "icon": "📦",
+      "badge": "PRODUCT STRATEGY & ROADMAPPING",
+      "desc": "Product Strategy, roadmap planning, user research, and Agile product development frameworks."
+    },
+    {
+      "title": "Generative AI for Everyone",
+      "issuer": "DeepLearning.AI",
+      "icon": "🤖",
+      "badge": "DEEPLEARNING.AI · GEN AI",
+      "desc": "Foundations of Large Language Models (LLMs), prompt engineering techniques, AI ethics, and real-world GenAI deployment."
+    },
+    {
+      "title": "Breast Cancer Prediction using SVM",
+      "issuer": "Machine Learning Research",
+      "icon": "🩺",
+      "badge": "SUPERVISED ML · HEALTHCARE AI",
+      "desc": "Supervised Learning classification model using Support Vector Machines for clinical medical diagnostics."
+    },
+    {
+      "title": "Strategy and Sustainability",
+      "issuer": "Executive Certification",
+      "icon": "🌿",
+      "badge": "SUSTAINABLE TECH & ESG",
+      "desc": "Sustainable business practices, ESG strategies, and eco-friendly technology implementation."
+    },
+    {
+      "title": "Global Environmental Management",
+      "issuer": "International Certification",
+      "icon": "🌍",
+      "badge": "ENVIRONMENTAL POLICY",
+      "desc": "Environmental policy, clean energy transition, and global sustainability systems monitoring."
+    }
   ],
   "experiences": [
     {
@@ -109,7 +155,12 @@
         "Worked on real-world projects involving application development, debugging, and software maintenance.",
         "Collaborated with cross-functional teams to enhance technical and problem-solving skills."
       ],
-      "tags": ["Software Dev", "IT Services", "App Development", "Debugging"]
+      "tags": [
+        "Software Dev",
+        "IT Services",
+        "App Development",
+        "Debugging"
+      ]
     },
     {
       "id": 2,
@@ -123,7 +174,12 @@
         "Executed Machine Learning models and data science algorithms for social impact applications.",
         "Analyzed data pipelines, model optimization, and feature engineering for AI solutions."
       ],
-      "tags": ["AI", "Machine Learning", "Data Science", "Python"]
+      "tags": [
+        "AI",
+        "Machine Learning",
+        "Data Science",
+        "Python"
+      ]
     },
     {
       "id": 3,
@@ -137,7 +193,11 @@
         "Successfully completed intensive 8-week Summer Internship program on Python and Machine Learning.",
         "Demonstrated exemplary dedication, hands-on algorithm implementation, and predictive modeling."
       ],
-      "tags": ["Python", "ML Algorithms", "Predictive Modeling"]
+      "tags": [
+        "Python",
+        "ML Algorithms",
+        "Predictive Modeling"
+      ]
     },
     {
       "id": 4,
@@ -150,7 +210,11 @@
       "details": [
         "Engaged in technical research projects, campus development initiatives, and skill mentorship at IIT Jammu."
       ],
-      "tags": ["IIT Jammu", "Research", "Tech Innovation"]
+      "tags": [
+        "IIT Jammu",
+        "Research",
+        "Tech Innovation"
+      ]
     },
     {
       "id": 5,
@@ -163,7 +227,11 @@
       "details": [
         "Contributed to operational workflows, digital asset management, and student housing platform services."
       ],
-      "tags": ["Operations", "Platform Management", "Growth"]
+      "tags": [
+        "Operations",
+        "Platform Management",
+        "Growth"
+      ]
     },
     {
       "id": 6,
@@ -177,7 +245,11 @@
         "Promoted GUVI tech courses and upskilling programs to fellow students to foster tech skill growth.",
         "Organized webinars, student outreach, and career development initiatives in collaboration with IITM Research Park."
       ],
-      "tags": ["IITM Research Park", "Tech Ambassador", "Student Outreach"]
+      "tags": [
+        "IITM Research Park",
+        "Tech Ambassador",
+        "Student Outreach"
+      ]
     },
     {
       "id": 7,
@@ -190,7 +262,11 @@
       "details": [
         "Led campus marketing and student engagement for IIM Bangalore's flagship annual business fest Vista."
       ],
-      "tags": ["IIM Bangalore", "Marketing", "Leadership"]
+      "tags": [
+        "IIM Bangalore",
+        "Marketing",
+        "Leadership"
+      ]
     },
     {
       "id": 8,
@@ -203,7 +279,11 @@
       "details": [
         "Researched decentralized ledgers, smart contracts, and cryptographic security protocols under IEEE student chapter."
       ],
-      "tags": ["Blockchain", "IEEE", "Smart Contracts"]
+      "tags": [
+        "Blockchain",
+        "IEEE",
+        "Smart Contracts"
+      ]
     },
     {
       "id": 9,
@@ -217,7 +297,11 @@
         "Completed research internship on Energy Hybrid Systems at IIT Ropar iHub AWaDH.",
         "Gained hands-on skills in clean energy monitoring, hardware-software integration, and sustainable tech."
       ],
-      "tags": ["IIT Ropar", "Energy Hybrid Systems", "Clean Tech"]
+      "tags": [
+        "IIT Ropar",
+        "Energy Hybrid Systems",
+        "Clean Tech"
+      ]
     },
     {
       "id": 10,
@@ -231,7 +315,12 @@
         "Designed, recommended, and pitched website feature improvements for existing and new platforms.",
         "Troubleshot bugs in web-based applications and provided technical support for web systems."
       ],
-      "tags": ["Web Development", "Frontend UI", "Debugging", "Tech Support"]
+      "tags": [
+        "Web Development",
+        "Frontend UI",
+        "Debugging",
+        "Tech Support"
+      ]
     },
     {
       "id": 11,
@@ -244,7 +333,11 @@
       "details": [
         "Supported startup pitch decks, incubation events, and entrepreneurship initiatives at NITK Surathkal E-Cell."
       ],
-      "tags": ["E-Cell NITK", "Entrepreneurship", "Project Planning"]
+      "tags": [
+        "E-Cell NITK",
+        "Entrepreneurship",
+        "Project Planning"
+      ]
     },
     {
       "id": 12,
@@ -257,7 +350,11 @@
       "details": [
         "Represented Asia's largest college cultural festival Mood Indigo IIT Bombay across Delhi university circuits."
       ],
-      "tags": ["IIT Bombay", "Mood Indigo", "Public Relations"]
+      "tags": [
+        "IIT Bombay",
+        "Mood Indigo",
+        "Public Relations"
+      ]
     }
   ],
   "education": [
