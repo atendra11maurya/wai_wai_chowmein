@@ -131,6 +131,22 @@ export default function App() {
     setUnsavedChanges(false)
   }
 
+  const handleExitEditMode = () => {
+    const saved = localStorage.getItem('userPortfolioData')
+    if (saved) {
+      try {
+        setPortfolioData(JSON.parse(saved))
+      } catch {
+        setPortfolioData(defaultPortfolioData)
+      }
+    } else {
+      setPortfolioData(defaultPortfolioData)
+    }
+    setEditMode(false)
+    setIsAdminLoggedIn(false)
+    setUnsavedChanges(false)
+  }
+
   const openDialog = (customData = null) => {
     setCustomDialogData(customData)
     setActiveDialog('contact')
@@ -652,14 +668,14 @@ export default function App() {
             </button>
             <button 
               className="pill primary" 
-              onClick={() => { if (unsavedChanges) handleSaveData(); setEditMode(false); setIsAdminLoggedIn(false); }}
+              onClick={() => { if (unsavedChanges) handleSaveData(); handleExitEditMode(); }}
               style={{ background: '#b91c1c' }}
             >
               Save & Exit
             </button>
             <button 
               className="pill glass" 
-              onClick={() => { setEditMode(false); setIsAdminLoggedIn(false); }}
+              onClick={handleExitEditMode}
             >
               Exit
             </button>
