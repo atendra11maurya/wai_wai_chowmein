@@ -1,499 +1,573 @@
 import { useState } from 'react'
 
-// Reusable editable list item card with delete, expand/collapse
-function EditableCard({ item, fields, onChange, onDelete, title }) {
-  const [expanded, setExpanded] = useState(false)
+// Edit Modal - opens when clicking ✏️ on any card
+function EditModal({ title, fields, data, onSave, onClose }) {
+  const [formData, setFormData] = useState({ ...data })
+
+  const handleChange = (key, val) => {
+    setFormData(prev => ({ ...prev, [key]: val }))
+  }
+
+  const handleListChange = (key, idx, val) => {
+    const updated = [...(formData[key] || [])]
+    updated[idx] = val
+    setFormData(prev => ({ ...prev, [key]: updated }))
+  }
+
+  const handleListAdd = (key) => {
+    setFormData(prev => ({ ...prev, [key]: [...(prev[key] || []), ''] }))
+  }
+
+  const handleListRemove = (key, idx) => {
+    setFormData(prev => ({ ...prev, [key]: prev[key].filter((_, i) => i !== idx) }))
+  }
 
   return (
-    <div className="admin-card glass">
-      <div className="admin-card-header" onClick={() => setExpanded(!expanded)}>
-        <div className="admin-card-title">
-          <span style={{ fontSize: '18px', marginRight: '8px' }}>{item.icon || '📄'}</span>
-          <span>{title || item.title || item.role || item.degree || item.label || 'Untitled'}</span>
-        </div>
-        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <button
-            className="admin-delete-btn"
-            onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            title="Delete this item"
-          >
-            🗑️
-          </button>
-          <span className="admin-chevron">{expanded ? '▲' : '▼'}</span>
-        </div>
-      </div>
+    <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
+      <section
+        className="modal glass"
+        role="dialog"
+        aria-modal="true"
+        onMouseDown={(e) => e.stopPropagation()}
+        style={{ maxWidth: '580px', maxHeight: '85vh', overflow: 'auto' }}
+      >
+        <p className="eyebrow">✏️ EDIT MODE</p>
+        <h2 style={{ fontSize: '22px', margin: '4px 0 20px' }}>{title}</h2>
 
-      {expanded && (
-        <div className="admin-card-body">
-          {fields.map((field) => {
-            if (field.type === 'list') {
-              return (
-                <EditableListField
-                  key={field.key}
-                  label={field.label}
-                  items={item[field.key] || []}
-                  onChange={(newList) => onChange(field.key, newList)}
-                />
-              )
-            }
-
+        {fields.map((field) => {
+          if (field.type === 'list') {
+            const items = formData[field.key] || []
             return (
-              <div key={field.key} className="admin-field">
-                <label className="admin-label">{field.label}</label>
-                {field.type === 'textarea' ? (
-                  <textarea
-                    className="form-textarea"
-                    rows={3}
-                    value={item[field.key] || ''}
-                    onChange={(e) => onChange(field.key, e.target.value)}
-                  />
-                ) : (
-                  <input
-                    type={field.type || 'text'}
-                    className="form-input"
-                    value={item[field.key] || ''}
-                    onChange={(e) => onChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
-                  />
-                )}
+              <div key={field.key} style={{ marginBottom: '16px' }}>
+                <label className="admin-label" style={{ marginBottom: '8px', display: 'block' }}>{field.label}</label>
+                {items.map((item, idx) => (
+                  <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={item}
+                      onChange={(e) => handleListChange(field.key, idx, e.target.value)}
+                      style={{ flex: 1 }}
+                    />
+                    <button className="admin-inline-btn delete" onClick={() => handleListRemove(field.key, idx)}>✕</button>
+                  </div>
+                ))}
+                <button className="admin-inline-btn add" onClick={() => handleListAdd(field.key)}>+ Add</button>
               </div>
             )
-          })}
-        </div>
-      )}
-    </div>
-  )
-}
+          }
 
-// Editable list of simple strings (tags, skills, detail bullets)
-function EditableListField({ label, items, onChange }) {
-  const handleItemChange = (idx, val) => {
-    const updated = [...items]
-    updated[idx] = val
-    onChange(updated)
-  }
-  const handleAdd = () => onChange([...items, ''])
-  const handleRemove = (idx) => onChange(items.filter((_, i) => i !== idx))
+          return (
+            <div key={field.key} style={{ marginBottom: '14px' }}>
+              <label className="admin-label" style={{ marginBottom: '6px', display: 'block' }}>{field.label}</label>
+              {field.type === 'textarea' ? (
+                <textarea
+                  className="form-textarea"
+                  rows={3}
+                  value={formData[field.key] || ''}
+                  onChange={(e) => handleChange(field.key, e.target.value)}
+                />
+              ) : (
+                <input
+                  type={field.type || 'text'}
+                  className="form-input"
+                  value={formData[field.key] || ''}
+                  onChange={(e) => handleChange(field.key, field.type === 'number' ? Number(e.target.value) : e.target.value)}
+                />
+              )}
+            </div>
+          )
+        })}
 
-  return (
-    <div className="admin-field">
-      <label className="admin-label">{label}</label>
-      {items.map((item, idx) => (
-        <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '6px' }}>
-          <input
-            type="text"
-            className="form-input"
-            value={item}
-            onChange={(e) => handleItemChange(idx, e.target.value)}
-            style={{ flex: 1 }}
-          />
-          <button
-            className="admin-delete-btn"
-            onClick={() => handleRemove(idx)}
-            title="Remove"
-            style={{ minWidth: '36px' }}
-          >
-            ✕
+        <div className="modal-row" style={{ marginTop: '20px' }}>
+          <button className="pill primary" onClick={() => { onSave(formData); onClose(); }}>
+            ✓ Save Changes
           </button>
+          <button className="pill glass" onClick={onClose}>Cancel</button>
         </div>
-      ))}
-      <button className="admin-add-btn" onClick={handleAdd} type="button">
-        + Add {label.replace(/s$/, '')}
-      </button>
+      </section>
     </div>
   )
 }
 
-// Section header with add button
-function AdminSection({ title, subtitle, icon, count, onAdd, addLabel, children }) {
-  const [collapsed, setCollapsed] = useState(false)
-
+// Overlay wrapper that adds edit/delete buttons on hover
+function EditableOverlay({ onEdit, onDelete, children }) {
   return (
-    <div className="admin-section glass" style={{ marginTop: '20px' }}>
-      <div className="admin-section-header" onClick={() => setCollapsed(!collapsed)}>
-        <div>
-          <h3 className="admin-section-title">{icon} {title} <span className="admin-count">({count})</span></h3>
-          {subtitle && <p className="admin-section-subtitle">{subtitle}</p>}
-        </div>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          {onAdd && (
-            <button className="admin-add-btn" onClick={(e) => { e.stopPropagation(); onAdd(); }}>
-              + {addLabel || 'Add New'}
-            </button>
-          )}
-          <span className="admin-chevron">{collapsed ? '▼' : '▲'}</span>
-        </div>
+    <div className="admin-editable-wrapper">
+      {children}
+      <div className="admin-overlay-buttons">
+        <button className="admin-overlay-btn edit" onClick={(e) => { e.stopPropagation(); onEdit(); }} title="Edit">✏️</button>
+        {onDelete && <button className="admin-overlay-btn delete" onClick={(e) => { e.stopPropagation(); onDelete(); }} title="Delete">🗑️</button>}
       </div>
-      {!collapsed && <div className="admin-section-body">{children}</div>}
     </div>
   )
 }
 
 export default function AdminDashboard({ portfolioData, onSave, onLogout }) {
-  const [formData, setFormData] = useState(JSON.parse(JSON.stringify(portfolioData)))
+  const [data, setData] = useState(JSON.parse(JSON.stringify(portfolioData)))
+  const [activeAdminTab, setActiveAdminTab] = useState('home')
+  const [editModal, setEditModal] = useState(null) // { title, fields, data, onSave }
+  const [filter, setFilter] = useState('all')
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  // ── Helpers ───────────────────────────────────────────
-  const updatePersonal = (field, val) => {
-    setFormData(d => ({ ...d, personal: { ...d.personal, [field]: val } }))
-  }
-
-  const updateListItem = (listKey, idx, field, val) => {
-    setFormData(d => {
+  // ── Data mutation helpers ──
+  const updateItem = (listKey, idx, newData) => {
+    setData(d => {
       const list = [...d[listKey]]
-      list[idx] = { ...list[idx], [field]: val }
+      list[idx] = { ...list[idx], ...newData }
       return { ...d, [listKey]: list }
     })
   }
 
-  const deleteListItem = (listKey, idx) => {
-    setFormData(d => ({ ...d, [listKey]: d[listKey].filter((_, i) => i !== idx) }))
+  const deleteItem = (listKey, idx) => {
+    if (!confirm('Delete this item?')) return
+    setData(d => ({ ...d, [listKey]: d[listKey].filter((_, i) => i !== idx) }))
   }
 
-  const addListItem = (listKey, template) => {
-    setFormData(d => ({ ...d, [listKey]: [...d[listKey], template] }))
+  const addItem = (listKey, template) => {
+    setData(d => ({ ...d, [listKey]: [...d[listKey], template] }))
   }
 
-  const updateSkill = (idx, val) => {
-    setFormData(d => {
-      const skills = [...d.topSkills]
-      skills[idx] = val
-      return { ...d, topSkills: skills }
-    })
-  }
-
-  const deleteSkill = (idx) => {
-    setFormData(d => ({ ...d, topSkills: d.topSkills.filter((_, i) => i !== idx) }))
-  }
-
-  // ── Save / Export ─────────────────────────────────────
-  const handleSave = () => {
-    onSave(formData)
+  const handleGlobalSave = () => {
+    onSave(data)
     setSaveSuccess(true)
     setTimeout(() => setSaveSuccess(false), 3000)
   }
 
-  const handleDownloadJSON = () => {
-    const jsonStr = JSON.stringify(formData, null, 2)
-    const blob = new Blob([jsonStr], { type: 'application/json' })
+  const handleExport = () => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = url
-    a.download = 'portfolioData.json'
-    a.click()
+    a.href = url; a.download = 'portfolioData.json'; a.click()
     URL.revokeObjectURL(url)
   }
 
-  // ── Field definitions ─────────────────────────────────
+  // Field definitions for each type
+  const personalFields = [
+    { key: 'name', label: 'Full Name' }, { key: 'shortName', label: 'Short Name (Navbar)' },
+    { key: 'avatarInitials', label: 'Avatar Initials' }, { key: 'avatarImage', label: 'Avatar Image Path' },
+    { key: 'title', label: 'Title & Tagline' }, { key: 'location', label: 'Location' },
+    { key: 'email', label: 'Email' }, { key: 'whatsappNumber', label: 'WhatsApp Number' },
+    { key: 'whatsappMessage', label: 'WhatsApp Default Message' },
+    { key: 'linkedin', label: 'LinkedIn URL' }, { key: 'github', label: 'GitHub URL' },
+    { key: 'resumeUrl', label: 'Resume PDF URL' }, { key: 'adminPassword', label: 'Admin Password' },
+    { key: 'summary', label: 'Summary / Bio', type: 'textarea' }
+  ]
   const experienceFields = [
-    { key: 'role', label: 'Role / Job Title' },
-    { key: 'company', label: 'Company / Institution' },
-    { key: 'location', label: 'Location' },
-    { key: 'period', label: 'Time Period' },
-    { key: 'category', label: 'Category (work / ai / research / leadership)' },
+    { key: 'role', label: 'Role Title' }, { key: 'company', label: 'Company' },
+    { key: 'location', label: 'Location' }, { key: 'period', label: 'Time Period' },
+    { key: 'category', label: 'Category (work/ai/research/leadership)' },
     { key: 'icon', label: 'Icon Emoji' },
-    { key: 'details', label: 'Key Responsibilities', type: 'list' },
+    { key: 'details', label: 'Responsibilities', type: 'list' },
     { key: 'tags', label: 'Tags', type: 'list' }
   ]
-
   const projectFields = [
-    { key: 'title', label: 'Project Title' },
-    { key: 'category', label: 'Category' },
-    { key: 'desc', label: 'Description', type: 'textarea' },
-    { key: 'icon', label: 'Icon Emoji' },
+    { key: 'title', label: 'Project Title' }, { key: 'category', label: 'Category' },
+    { key: 'desc', label: 'Description', type: 'textarea' }, { key: 'icon', label: 'Icon Emoji' },
     { key: 'badge', label: 'Badge Tag' },
-    { key: 'liveUrl', label: 'Live Demo URL' },
-    { key: 'githubUrl', label: 'GitHub Source URL' }
+    { key: 'liveUrl', label: 'Live Demo URL' }, { key: 'githubUrl', label: 'GitHub Source URL' }
   ]
-
   const educationFields = [
-    { key: 'degree', label: 'Degree Title' },
-    { key: 'institution', label: 'Institution Name' },
-    { key: 'field', label: 'Field of Study' },
-    { key: 'badge', label: 'Badge Tag' },
-    { key: 'period', label: 'Time Period' },
+    { key: 'degree', label: 'Degree' }, { key: 'institution', label: 'Institution' },
+    { key: 'field', label: 'Field of Study' }, { key: 'badge', label: 'Badge Tag' },
+    { key: 'period', label: 'Period' }, { key: 'desc', label: 'Description', type: 'textarea' }
+  ]
+  const certFields = [
+    { key: 'title', label: 'Title' }, { key: 'issuer', label: 'Issuer' },
+    { key: 'icon', label: 'Icon Emoji' }, { key: 'badge', label: 'Badge Tag' },
     { key: 'desc', label: 'Description', type: 'textarea' }
   ]
-
-  const certificationFields = [
-    { key: 'title', label: 'Certification Title' },
-    { key: 'issuer', label: 'Issuer / Organization' },
-    { key: 'icon', label: 'Icon Emoji' },
-    { key: 'badge', label: 'Badge Tag' },
-    { key: 'desc', label: 'Description', type: 'textarea' }
-  ]
-
   const testimonialFields = [
-    { key: 'quote', label: 'Quote / Feedback', type: 'textarea' },
-    { key: 'author', label: 'Author Name' },
-    { key: 'title', label: 'Author Title / Designation' },
-    { key: 'avatar', label: 'Avatar Emoji' }
+    { key: 'quote', label: 'Quote', type: 'textarea' }, { key: 'author', label: 'Author Name' },
+    { key: 'title', label: 'Designation' }, { key: 'avatar', label: 'Avatar Emoji' }
   ]
-
   const achievementFields = [
-    { key: 'id', label: 'ID (hcl / iit / iiit / ai-health)' },
-    { key: 'title', label: 'Title' },
-    { key: 'badge', label: 'Badge Tag' },
-    { key: 'icon', label: 'Icon Emoji' },
-    { key: 'description', label: 'Description', type: 'textarea' },
-    { key: 'actionText', label: 'Button Text' }
+    { key: 'id', label: 'ID' }, { key: 'title', label: 'Title' },
+    { key: 'badge', label: 'Badge' }, { key: 'icon', label: 'Icon Emoji' },
+    { key: 'description', label: 'Description', type: 'textarea' }, { key: 'actionText', label: 'Button Text' }
+  ]
+  const metricFields = [
+    { key: 'value', label: 'Value (e.g. 12+)' }, { key: 'label', label: 'Label' }, { key: 'subtext', label: 'Subtext' }
   ]
 
-  const metricFields = [
-    { key: 'value', label: 'Value (e.g. 12+)' },
-    { key: 'label', label: 'Label' },
-    { key: 'subtext', label: 'Subtext' }
-  ]
+  const filteredExperiences = filter === 'all'
+    ? data.experiences
+    : data.experiences.filter(exp => exp.category === filter)
+
+  const navigateAdmin = (tab) => {
+    setActiveAdminTab(tab)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   return (
-    <section className="events-page">
-      {/* Admin Header */}
-      <header className="hero glass" style={{ minHeight: 'auto', padding: '28px 32px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <p className="eyebrow">🔐 ADMIN CONTENT MANAGER</p>
-            <h1 style={{ fontSize: 'clamp(24px, 4vw, 40px)', margin: '4px 0' }}>Website Admin Panel</h1>
-            <p className="intro" style={{ margin: 0, fontSize: '14px' }}>
-              Edit every element of the website — personal info, experiences, projects, education, certifications, testimonials, skills, and more.
-            </p>
-          </div>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-            <button className="pill primary" onClick={handleSave}>
-              {saveSuccess ? '✓ Changes Saved!' : '💾 Save & Apply'}
-            </button>
-            <button className="pill glass" onClick={handleDownloadJSON}>
-              📥 Export JSON
-            </button>
-            <button className="pill glass" onClick={onLogout} style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}>
-              🔒 Logout
-            </button>
-          </div>
+    <>
+      {/* Sticky Admin Toolbar */}
+      <div className="admin-toolbar">
+        <span className="admin-toolbar-badge">🔐 ADMIN MODE</span>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button className="pill primary" onClick={handleGlobalSave} style={{ padding: '10px 18px', fontSize: '14px' }}>
+            {saveSuccess ? '✓ Saved!' : '💾 Save All'}
+          </button>
+          <button className="pill glass" onClick={handleExport} style={{ padding: '10px 18px', fontSize: '14px' }}>📥 Export</button>
+          <button className="pill glass" onClick={onLogout} style={{ padding: '10px 18px', fontSize: '14px', color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}>Logout</button>
         </div>
-      </header>
+      </div>
 
-      {/* ─────── 1. PERSONAL INFO ─────── */}
-      <AdminSection title="Personal & Brand Settings" icon="👤" count="1" subtitle="Name, email, WhatsApp, social links, bio, and admin password">
-        <div className="admin-grid">
-          {[
-            { key: 'name', label: 'Full Name' },
-            { key: 'shortName', label: 'Short Name (Navbar)' },
-            { key: 'avatarInitials', label: 'Avatar Initials' },
-            { key: 'email', label: 'Email Address' },
-            { key: 'whatsappNumber', label: 'WhatsApp Number (e.g. 919876543210)' },
-            { key: 'whatsappMessage', label: 'WhatsApp Default Message' },
-            { key: 'linkedin', label: 'LinkedIn URL' },
-            { key: 'github', label: 'GitHub URL' },
-            { key: 'location', label: 'Location' },
-            { key: 'avatarImage', label: 'Avatar Image Path' },
-            { key: 'resumeUrl', label: 'Resume File URL' },
-            { key: 'adminPassword', label: 'Admin Password' }
-          ].map(f => (
-            <div key={f.key} className="admin-field">
-              <label className="admin-label">{f.label}</label>
-              <input
-                type="text"
-                className="form-input"
-                value={formData.personal[f.key] || ''}
-                onChange={(e) => updatePersonal(f.key, e.target.value)}
-              />
+      {/* Same Tab Navigation as Main Website */}
+      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px', marginBottom: '8px' }}>
+        {[
+          { key: 'home', label: 'Home' },
+          { key: 'experience', label: `Experience (${data.experiences.length})` },
+          { key: 'projects', label: `Projects (${data.projects.length})` },
+          { key: 'education', label: `Education (${data.education.length})` },
+          { key: 'skills', label: 'Skills & Certs' }
+        ].map(tab => (
+          <button
+            key={tab.key}
+            className={`pill ${activeAdminTab === tab.key ? 'primary' : 'glass'}`}
+            onClick={() => navigateAdmin(tab.key)}
+            style={{ fontSize: '14px', padding: '10px 18px' }}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ═══════════ HOME TAB ═══════════ */}
+      {activeAdminTab === 'home' && (
+        <>
+          {/* Hero Section - Editable */}
+          <EditableOverlay onEdit={() => setEditModal({
+            title: 'Edit Personal Info & Hero',
+            fields: personalFields,
+            data: data.personal,
+            onSave: (newData) => setData(d => ({ ...d, personal: { ...d.personal, ...newData } }))
+          })}>
+            <section className="hero glass">
+              <div className="hero-content-layout">
+                <div className="hero-text-block">
+                  <h1 className="hero-name">{data.personal.name}</h1>
+                  <div className="hero-role-title"><span>{data.personal.title}</span></div>
+                  <div className="hero-bio">
+                    <p style={{ margin: '14px 0 0', color: '#475569', fontSize: '15px', lineHeight: '1.65' }}>{data.personal.summary}</p>
+                  </div>
+                </div>
+                <div className="hero-avatar-wrapper">
+                  <img src={data.personal.avatarImage} alt={`${data.personal.name} Avatar`} className="hero-avatar-3d" />
+                </div>
+              </div>
+            </section>
+          </EditableOverlay>
+
+          {/* Impact Metrics - Editable */}
+          <section className="metrics-section">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <h3 style={{ margin: 0, fontSize: '16px', color: '#64748b' }}>📊 Impact Metrics</h3>
+              <button className="admin-inline-btn add" onClick={() => addItem('impactMetrics', { value: '0+', label: 'New Metric', subtext: 'Description' })}>+ Add Metric</button>
             </div>
-          ))}
-        </div>
+            <div className="metrics-grid">
+              {data.impactMetrics.map((metric, idx) => (
+                <EditableOverlay
+                  key={idx}
+                  onEdit={() => setEditModal({
+                    title: 'Edit Metric',
+                    fields: metricFields,
+                    data: metric,
+                    onSave: (newData) => updateItem('impactMetrics', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('impactMetrics', idx)}
+                >
+                  <div className="metric-card glass">
+                    <div className="metric-value">{metric.value}</div>
+                    <div className="metric-label">{metric.label}</div>
+                    <div className="metric-subtext">{metric.subtext}</div>
+                  </div>
+                </EditableOverlay>
+              ))}
+            </div>
+          </section>
 
-        <div className="admin-field" style={{ marginTop: '12px' }}>
-          <label className="admin-label">Title & Tagline</label>
-          <input
-            type="text"
-            className="form-input"
-            value={formData.personal.title}
-            onChange={(e) => updatePersonal('title', e.target.value)}
-          />
-        </div>
+          {/* Top Achievements - Editable */}
+          <section className="fest-container-card glass">
+            <div className="fest-header">
+              <div className="fest-header-top">
+                <span className="fest-eyebrow-badge">FLAGSHIP ACHIEVEMENTS</span>
+                <button className="admin-inline-btn add" onClick={() => addItem('topAchievements', { id: 'new', title: 'New Achievement', badge: 'NEW', icon: '🌟', description: 'Description', actionText: 'View ↗' })}>+ Add</button>
+              </div>
+              <h2>Major Career & Research Achievements</h2>
+            </div>
+            <div className="fest-sub-rows">
+              {data.topAchievements.map((item, idx) => (
+                <EditableOverlay
+                  key={item.id}
+                  onEdit={() => setEditModal({
+                    title: 'Edit Achievement',
+                    fields: achievementFields,
+                    data: item,
+                    onSave: (newData) => updateItem('topAchievements', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('topAchievements', idx)}
+                >
+                  <div className="fest-row-card glass">
+                    <div className="row-card-content">
+                      <span className="row-card-icon">{item.icon}</span>
+                      <div className="row-card-info">
+                        <span className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }}>{item.badge}</span>
+                        <h3>{item.title}</h3>
+                        <p>{item.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                </EditableOverlay>
+              ))}
+            </div>
+          </section>
 
-        <div className="admin-field" style={{ marginTop: '12px' }}>
-          <label className="admin-label">Summary / Bio</label>
-          <textarea
-            className="form-textarea"
-            rows={4}
-            value={formData.personal.summary}
-            onChange={(e) => updatePersonal('summary', e.target.value)}
-          />
-        </div>
-      </AdminSection>
+          {/* Testimonials - Editable */}
+          <section className="fest-container-card glass" style={{ marginTop: '32px' }}>
+            <div className="fest-header">
+              <div className="fest-header-top">
+                <span className="fest-eyebrow-badge">RECOMMENDATIONS & FEEDBACK</span>
+                <button className="admin-inline-btn add" onClick={() => addItem('testimonials', { quote: 'New testimonial...', author: 'Author', title: 'Designation', avatar: '⭐' })}>+ Add</button>
+              </div>
+              <h2>What Mentors & Leaders Say</h2>
+            </div>
+            <div className="testimonials-grid">
+              {data.testimonials.map((item, idx) => (
+                <EditableOverlay
+                  key={idx}
+                  onEdit={() => setEditModal({
+                    title: 'Edit Testimonial',
+                    fields: testimonialFields,
+                    data: item,
+                    onSave: (newData) => updateItem('testimonials', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('testimonials', idx)}
+                >
+                  <div className="testimonial-card glass">
+                    <div className="testimonial-quote">"{item.quote}"</div>
+                    <div className="testimonial-author">
+                      <div className="testimonial-avatar">{item.avatar}</div>
+                      <div className="testimonial-info">
+                        <h4>{item.author}</h4>
+                        <p>{item.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                </EditableOverlay>
+              ))}
+            </div>
+          </section>
+        </>
+      )}
 
-      {/* ─────── 2. IMPACT METRICS ─────── */}
-      <AdminSection
-        title="Impact Metrics"
-        icon="📊"
-        count={formData.impactMetrics.length}
-        subtitle="Homepage statistics counters"
-        onAdd={() => addListItem('impactMetrics', { value: '0+', label: 'New Metric', subtext: 'Description' })}
-        addLabel="Add Metric"
-      >
-        {formData.impactMetrics.map((metric, idx) => (
-          <EditableCard
-            key={idx}
-            item={metric}
-            title={`${metric.value} — ${metric.label}`}
-            fields={metricFields}
-            onChange={(field, val) => updateListItem('impactMetrics', idx, field, val)}
-            onDelete={() => deleteListItem('impactMetrics', idx)}
-          />
-        ))}
-      </AdminSection>
+      {/* ═══════════ EXPERIENCE TAB ═══════════ */}
+      {activeAdminTab === 'experience' && (
+        <section className="events-page">
+          <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
+            <p className="eyebrow">Professional Track Record · {data.experiences.length} Roles</p>
+            <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Work & Research Internships.</h1>
+            <div className="filter-bar" style={{ marginTop: '16px' }}>
+              {['all', 'work', 'ai', 'research', 'leadership'].map(f => (
+                <button key={f} className={`filter-btn ${filter === f ? 'active' : ''}`} onClick={() => setFilter(f)}>
+                  {f === 'all' ? `All (${data.experiences.length})` : f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+            </div>
+            <button className="admin-inline-btn add" style={{ marginTop: '16px' }} onClick={() => addItem('experiences', { id: Date.now(), role: 'New Role', company: 'Company', location: 'Location', period: 'Month Year – Month Year', category: 'work', icon: '💼', details: ['Description'], tags: ['Tag'] })}>
+              + Add New Experience
+            </button>
+          </header>
 
-      {/* ─────── 3. TOP SKILLS ─────── */}
-      <AdminSection
-        title="Top Skills"
-        icon="⚡"
-        count={formData.topSkills.length}
-        subtitle="Skills displayed across the portfolio"
-        onAdd={() => setFormData(d => ({ ...d, topSkills: [...d.topSkills, 'New Skill'] }))}
-        addLabel="Add Skill"
-      >
-        {formData.topSkills.map((skill, idx) => (
-          <div key={idx} style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
-            <input
-              type="text"
-              className="form-input"
-              value={skill}
-              onChange={(e) => updateSkill(idx, e.target.value)}
-              style={{ flex: 1 }}
-            />
-            <button className="admin-delete-btn" onClick={() => deleteSkill(idx)}>🗑️</button>
+          <div className="trajectory-wrapper">
+            {filteredExperiences.map((exp, idx) => {
+              const realIdx = data.experiences.indexOf(exp)
+              return (
+                <div key={exp.id} className="trajectory-step-container">
+                  <div className="trajectory-node-column">
+                    <div className="trajectory-dot"></div>
+                    {idx < filteredExperiences.length - 1 && <div className="trajectory-line"></div>}
+                  </div>
+                  <EditableOverlay
+                    onEdit={() => setEditModal({
+                      title: `Edit: ${exp.role} @ ${exp.company}`,
+                      fields: experienceFields,
+                      data: exp,
+                      onSave: (newData) => updateItem('experiences', realIdx, newData)
+                    })}
+                    onDelete={() => deleteItem('experiences', realIdx)}
+                  >
+                    <div className="trajectory-card glass">
+                      <div className="trajectory-card-header">
+                        <span className="fest-eyebrow-badge">{exp.company}</span>
+                        <span className="date-text" style={{ margin: 0 }}>🗓️ {exp.period}</span>
+                      </div>
+                      <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)' }}>{exp.icon} {exp.role}</h2>
+                      <div className="trajectory-institution">📍 {exp.location}</div>
+                      <ul style={{ margin: '0 0 16px', paddingLeft: '20px', color: '#475569', fontSize: '14px', lineHeight: '1.65' }}>
+                        {exp.details.map((point, pIdx) => <li key={pIdx} style={{ marginBottom: '4px' }}>{point}</li>)}
+                      </ul>
+                      <div className="trajectory-footer" style={{ flexWrap: 'wrap' }}>
+                        {exp.tags.map((t, tIdx) => <span key={tIdx} className="tag-pill">{t}</span>)}
+                      </div>
+                    </div>
+                  </EditableOverlay>
+                </div>
+              )
+            })}
           </div>
-        ))}
-      </AdminSection>
+        </section>
+      )}
 
-      {/* ─────── 4. TOP ACHIEVEMENTS ─────── */}
-      <AdminSection
-        title="Top Achievements"
-        icon="🏆"
-        count={formData.topAchievements.length}
-        subtitle="Flagship highlights shown on the landing page"
-        onAdd={() => addListItem('topAchievements', { id: 'new', title: 'New Achievement', badge: 'NEW', icon: '🌟', description: 'Description here', actionText: 'View ↗' })}
-        addLabel="Add Achievement"
-      >
-        {formData.topAchievements.map((item, idx) => (
-          <EditableCard
-            key={idx}
-            item={item}
-            fields={achievementFields}
-            onChange={(field, val) => updateListItem('topAchievements', idx, field, val)}
-            onDelete={() => deleteListItem('topAchievements', idx)}
-          />
-        ))}
-      </AdminSection>
+      {/* ═══════════ PROJECTS TAB ═══════════ */}
+      {activeAdminTab === 'projects' && (
+        <section className="events-page">
+          <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
+            <p className="eyebrow">Innovations & Engineering</p>
+            <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Featured Projects & Research.</h1>
+            <button className="admin-inline-btn add" style={{ marginTop: '16px' }} onClick={() => addItem('projects', { title: 'New Project', category: 'Category', desc: 'Description', icon: '📁', badge: 'TAG', liveUrl: '', githubUrl: '' })}>
+              + Add New Project
+            </button>
+          </header>
+          <div className="fest-container-card glass" style={{ marginTop: '24px' }}>
+            <div className="fest-sub-rows">
+              {data.projects.map((proj, idx) => (
+                <EditableOverlay
+                  key={idx}
+                  onEdit={() => setEditModal({
+                    title: `Edit: ${proj.title}`,
+                    fields: projectFields,
+                    data: proj,
+                    onSave: (newData) => updateItem('projects', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('projects', idx)}
+                >
+                  <div className="fest-row-card glass">
+                    <div className="row-card-content">
+                      <span className="row-card-icon">{proj.icon}</span>
+                      <div className="row-card-info">
+                        <span className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }}>{proj.badge}</span>
+                        <h3>{proj.title}</h3>
+                        <p>{proj.desc}</p>
+                        <div className="project-action-buttons">
+                          {proj.liveUrl && <a className="project-btn primary" href={proj.liveUrl} target="_blank" rel="noopener noreferrer">Live Demo ↗</a>}
+                          {proj.githubUrl && <a className="project-btn secondary" href={proj.githubUrl} target="_blank" rel="noopener noreferrer">Source Code ↗</a>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </EditableOverlay>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* ─────── 5. EXPERIENCES ─────── */}
-      <AdminSection
-        title="Work & Research Experiences"
-        icon="💼"
-        count={formData.experiences.length}
-        subtitle="All internships, jobs, and ambassador roles"
-        onAdd={() => addListItem('experiences', { id: Date.now(), role: 'New Role', company: 'Company', location: 'Location', period: 'Month Year – Month Year', category: 'work', icon: '💼', details: ['Description'], tags: ['Tag'] })}
-        addLabel="Add Experience"
-      >
-        {formData.experiences.map((exp, idx) => (
-          <EditableCard
-            key={exp.id || idx}
-            item={exp}
-            title={`${exp.role} @ ${exp.company}`}
-            fields={experienceFields}
-            onChange={(field, val) => updateListItem('experiences', idx, field, val)}
-            onDelete={() => deleteListItem('experiences', idx)}
-          />
-        ))}
-      </AdminSection>
+      {/* ═══════════ EDUCATION TAB ═══════════ */}
+      {activeAdminTab === 'education' && (
+        <section className="events-page">
+          <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
+            <p className="eyebrow">Academic Progression</p>
+            <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Educational Trajectory.</h1>
+            <button className="admin-inline-btn add" style={{ marginTop: '16px' }} onClick={() => addItem('education', { badge: 'DEGREE · INSTITUTION', degree: 'New Degree', field: 'FIELD', institution: 'Institution', period: 'Year – Year', desc: 'Description' })}>
+              + Add Education
+            </button>
+          </header>
+          <div className="trajectory-wrapper">
+            {data.education.map((edu, idx) => (
+              <div key={idx} className="trajectory-step-container">
+                <div className="trajectory-node-column">
+                  <div className="trajectory-dot"></div>
+                  {idx < data.education.length - 1 && <div className="trajectory-line"></div>}
+                </div>
+                <EditableOverlay
+                  onEdit={() => setEditModal({
+                    title: `Edit: ${edu.degree}`,
+                    fields: educationFields,
+                    data: edu,
+                    onSave: (newData) => updateItem('education', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('education', idx)}
+                >
+                  <div className="trajectory-card glass">
+                    <div className="trajectory-card-header">
+                      <span className="fest-eyebrow-badge">{edu.badge}</span>
+                      <span className="date-text" style={{ margin: 0 }}>🗓️ {edu.period}</span>
+                    </div>
+                    <h2 className="trajectory-degree">{edu.degree}</h2>
+                    <div className="trajectory-institution">🏛️ {edu.institution}</div>
+                    <p className="trajectory-desc">{edu.desc}</p>
+                    <div className="trajectory-footer">
+                      <span className="badge-tag accent">{edu.field}</span>
+                    </div>
+                  </div>
+                </EditableOverlay>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* ─────── 6. EDUCATION ─────── */}
-      <AdminSection
-        title="Education"
-        icon="🎓"
-        count={formData.education.length}
-        subtitle="Academic degrees and diplomas"
-        onAdd={() => addListItem('education', { badge: 'DEGREE · INSTITUTION', degree: 'New Degree', field: 'FIELD', institution: 'Institution Name', period: 'Year – Year', desc: 'Description' })}
-        addLabel="Add Education"
-      >
-        {formData.education.map((edu, idx) => (
-          <EditableCard
-            key={idx}
-            item={edu}
-            title={edu.degree}
-            fields={educationFields}
-            onChange={(field, val) => updateListItem('education', idx, field, val)}
-            onDelete={() => deleteListItem('education', idx)}
-          />
-        ))}
-      </AdminSection>
+      {/* ═══════════ SKILLS & CERTS TAB ═══════════ */}
+      {activeAdminTab === 'skills' && (
+        <section className="events-page">
+          <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
+            <p className="eyebrow">Technical Competencies</p>
+            <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Top Skills & Certifications.</h1>
+            <button className="admin-inline-btn add" style={{ marginTop: '16px' }} onClick={() => addItem('certifications', { title: 'New Certification', issuer: 'Issuer', icon: '📜', badge: 'TAG', desc: 'Description' })}>
+              + Add Certification
+            </button>
+          </header>
+          <div className="trajectory-wrapper" style={{ marginTop: '24px' }}>
+            {data.certifications.map((cert, idx) => (
+              <div key={idx} className="trajectory-step-container">
+                <div className="trajectory-node-column">
+                  <div className="trajectory-dot"></div>
+                  {idx < data.certifications.length - 1 && <div className="trajectory-line"></div>}
+                </div>
+                <EditableOverlay
+                  onEdit={() => setEditModal({
+                    title: `Edit: ${cert.title}`,
+                    fields: certFields,
+                    data: cert,
+                    onSave: (newData) => updateItem('certifications', idx, newData)
+                  })}
+                  onDelete={() => deleteItem('certifications', idx)}
+                >
+                  <div className="trajectory-card glass" style={{ cursor: 'default' }}>
+                    <div className="trajectory-card-header">
+                      <span className="fest-eyebrow-badge">{cert.badge}</span>
+                      <span className="badge-tag accent">VERIFIED CERTIFICATE</span>
+                    </div>
+                    <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)' }}>{cert.icon} {cert.title}</h2>
+                    <div className="trajectory-institution">📜 {cert.issuer}</div>
+                    <p className="trajectory-desc">{cert.desc}</p>
+                  </div>
+                </EditableOverlay>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* ─────── 7. PROJECTS ─────── */}
-      <AdminSection
-        title="Featured Projects"
-        icon="🚀"
-        count={formData.projects.length}
-        subtitle="Projects with live demo and source code links"
-        onAdd={() => addListItem('projects', { title: 'New Project', category: 'Category', desc: 'Description', icon: '📁', badge: 'TAG', liveUrl: '', githubUrl: '' })}
-        addLabel="Add Project"
-      >
-        {formData.projects.map((proj, idx) => (
-          <EditableCard
-            key={idx}
-            item={proj}
-            fields={projectFields}
-            onChange={(field, val) => updateListItem('projects', idx, field, val)}
-            onDelete={() => deleteListItem('projects', idx)}
-          />
-        ))}
-      </AdminSection>
+      {/* Edit Modal */}
+      {editModal && (
+        <EditModal
+          title={editModal.title}
+          fields={editModal.fields}
+          data={editModal.data}
+          onSave={editModal.onSave}
+          onClose={() => setEditModal(null)}
+        />
+      )}
 
-      {/* ─────── 8. CERTIFICATIONS ─────── */}
-      <AdminSection
-        title="Certifications"
-        icon="📜"
-        count={formData.certifications.length}
-        subtitle="Verified certificates and credentials"
-        onAdd={() => addListItem('certifications', { title: 'New Certification', issuer: 'Issuer', icon: '📜', badge: 'TAG', desc: 'Description' })}
-        addLabel="Add Certification"
-      >
-        {formData.certifications.map((cert, idx) => (
-          <EditableCard
-            key={idx}
-            item={cert}
-            fields={certificationFields}
-            onChange={(field, val) => updateListItem('certifications', idx, field, val)}
-            onDelete={() => deleteListItem('certifications', idx)}
-          />
-        ))}
-      </AdminSection>
-
-      {/* ─────── 9. TESTIMONIALS ─────── */}
-      <AdminSection
-        title="Testimonials & Recommendations"
-        icon="⭐"
-        count={formData.testimonials.length}
-        subtitle="Quotes from mentors, managers, and colleagues"
-        onAdd={() => addListItem('testimonials', { quote: 'New testimonial quote here...', author: 'Author Name', title: 'Designation', avatar: '⭐' })}
-        addLabel="Add Testimonial"
-      >
-        {formData.testimonials.map((test, idx) => (
-          <EditableCard
-            key={idx}
-            item={test}
-            title={`"${test.quote.substring(0, 50)}..." — ${test.author}`}
-            fields={testimonialFields}
-            onChange={(field, val) => updateListItem('testimonials', idx, field, val)}
-            onDelete={() => deleteListItem('testimonials', idx)}
-          />
-        ))}
-      </AdminSection>
-
-      {/* Sticky bottom save bar */}
+      {/* Sticky Save Bar */}
       <div className="admin-sticky-save">
-        <button className="pill primary" onClick={handleSave} style={{ fontSize: '16px' }}>
+        <button className="pill primary" onClick={handleGlobalSave} style={{ fontSize: '16px' }}>
           {saveSuccess ? '✓ All Changes Saved!' : '💾 Save All Changes'}
         </button>
-        <button className="pill glass" onClick={handleDownloadJSON}>📥 Export JSON</button>
+        <button className="pill glass" onClick={handleExport}>📥 Export JSON</button>
       </div>
-    </section>
+    </>
   )
 }

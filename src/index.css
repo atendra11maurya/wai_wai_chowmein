@@ -1257,84 +1257,101 @@ footer {
 }
 
 /* ── Admin Dashboard Styles ──────────────────────── */
-.admin-section {
-  border-radius: 24px;
-  padding: 24px 28px;
-  overflow: hidden;
-}
-.admin-section-header {
+.admin-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  cursor: pointer;
-  user-select: none;
+  padding: 12px 20px;
+  border-radius: 16px;
+  margin-top: 16px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.06), rgba(251, 146, 60, 0.06));
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  flex-wrap: wrap;
+  gap: 10px;
 }
-.admin-section-title {
-  font-size: clamp(18px, 2.5vw, 22px);
-  font-weight: 850;
-  color: #0f172a;
-  margin: 0;
-}
-.admin-section-subtitle {
+.admin-toolbar-badge {
   font-size: 13px;
-  color: #64748b;
-  margin: 4px 0 0;
+  font-weight: 800;
+  color: #ef4444;
+  letter-spacing: 0.04em;
 }
-.admin-count {
-  color: #64748b;
-  font-weight: 600;
+
+/* Editable overlay wrapper */
+.admin-editable-wrapper {
+  position: relative;
+  width: 100%;
 }
-.admin-section-body {
-  margin-top: 20px;
+.admin-overlay-buttons {
+  position: absolute;
+  top: 12px;
+  right: 12px;
   display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 3;
 }
-.admin-card {
-  border-radius: 18px;
-  overflow: hidden;
-  transition: box-shadow 0.2s ease;
+.admin-editable-wrapper:hover .admin-overlay-buttons {
+  opacity: 1;
 }
-.admin-card:hover {
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
-.admin-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 20px;
+.admin-overlay-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: none;
   cursor: pointer;
-  gap: 12px;
-  user-select: none;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.12);
 }
-.admin-card-title {
-  display: flex;
+.admin-overlay-btn.edit {
+  background: #ffffff;
+  border: 1px solid rgba(2, 132, 199, 0.25);
+}
+.admin-overlay-btn.edit:hover {
+  background: rgba(2, 132, 199, 0.1);
+  border-color: #0284c7;
+}
+.admin-overlay-btn.delete {
+  background: #ffffff;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+.admin-overlay-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+}
+
+/* Inline add/delete buttons */
+.admin-inline-btn {
+  display: inline-flex;
   align-items: center;
-  font-weight: 750;
-  font-size: 15px;
-  color: #0f172a;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.admin-card-body {
-  padding: 0 20px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-.admin-chevron {
-  font-size: 12px;
-  color: #94a3b8;
-  flex-shrink: 0;
-}
-.admin-field {
-  display: flex;
-  flex-direction: column;
   gap: 4px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: none;
 }
+.admin-inline-btn.add {
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.08);
+  border: 1px dashed rgba(2, 132, 199, 0.3);
+}
+.admin-inline-btn.add:hover {
+  background: rgba(2, 132, 199, 0.16);
+}
+.admin-inline-btn.delete {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+.admin-inline-btn.delete:hover {
+  background: rgba(239, 68, 68, 0.16);
+}
+
 .admin-label {
   font-size: 12px;
   font-weight: 700;
@@ -1342,44 +1359,8 @@ footer {
   letter-spacing: 0.02em;
   text-transform: uppercase;
 }
-.admin-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 14px;
-}
-.admin-delete-btn {
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.2);
-  border-radius: 10px;
-  padding: 6px 10px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.15s ease;
-  flex-shrink: 0;
-}
-.admin-delete-btn:hover {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: rgba(239, 68, 68, 0.5);
-}
-.admin-add-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 16px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #0284c7;
-  background: rgba(2, 132, 199, 0.06);
-  border: 1px dashed rgba(2, 132, 199, 0.3);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  width: fit-content;
-}
-.admin-add-btn:hover {
-  background: rgba(2, 132, 199, 0.14);
-  border-color: rgba(2, 132, 199, 0.6);
-}
+
+/* Admin save bar */
 .admin-sticky-save {
   position: sticky;
   bottom: 16px;
@@ -1395,9 +1376,20 @@ footer {
   gap: 12px;
   z-index: 5;
 }
+
+/* Hover highlight on editable cards */
+.admin-editable-wrapper:hover > .hero,
+.admin-editable-wrapper:hover > .metric-card,
+.admin-editable-wrapper:hover > .fest-row-card,
+.admin-editable-wrapper:hover > .testimonial-card,
+.admin-editable-wrapper:hover > .trajectory-card {
+  outline: 2px dashed rgba(2, 132, 199, 0.35);
+  outline-offset: 4px;
+}
+
 @media (max-width: 640px) {
-  .admin-grid {
-    grid-template-columns: 1fr;
+  .admin-overlay-buttons {
+    opacity: 1;
   }
   .admin-sticky-save {
     flex-direction: column;
