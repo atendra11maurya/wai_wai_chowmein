@@ -79,10 +79,11 @@ function TopLeftResizer({ targetRef }) {
 
 export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, className, style, placeholder, ...props }) {
   const elemRef = useRef(null);
+  const [isHovered, setIsHovered] = useState(false);
   
   useEffect(() => {
     if (elemRef.current && document.activeElement !== elemRef.current) {
-      elemRef.current.textContent = value;
+      elemRef.current.textContent = value || '';
     }
   }, [value]);
 
@@ -102,26 +103,29 @@ export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, c
   };
 
   return (
-    <Tag
-      ref={elemRef}
-      className={`${className || ''} ${isEditMode ? 'editable-text' : ''}`}
-      style={style}
-      contentEditable={isEditMode}
-      suppressContentEditableWarning={true}
-      onBlur={isEditMode ? handleBlur : undefined}
-      onKeyDown={isEditMode ? handleKeyDown : undefined}
-      data-placeholder={placeholder}
-      {...props}
-    >
-      {isEditMode && <TopLeftResizer targetRef={elemRef} />}
-      {value}
-    </Tag>
+    <>
+      {isEditMode && isHovered && <TopLeftResizer targetRef={elemRef} />}
+      <Tag
+        ref={elemRef}
+        className={`${className || ''} ${isEditMode ? 'editable-text' : ''}`}
+        style={style}
+        contentEditable={isEditMode}
+        suppressContentEditableWarning={true}
+        onBlur={isEditMode ? handleBlur : undefined}
+        onKeyDown={isEditMode ? handleKeyDown : undefined}
+        onMouseEnter={() => isEditMode && setIsHovered(true)}
+        onMouseLeave={() => isEditMode && setIsHovered(false)}
+        data-placeholder={placeholder}
+        {...props}
+      />
+    </>
   );
 }
 
 export function EditableImage({ src, alt, className, style, onChange, isEditMode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputVal, setInputVal] = useState(src);
+  const [isHovered, setIsHovered] = useState(false);
   const wrapperRef = useRef(null);
 
   useEffect(() => {
@@ -144,8 +148,14 @@ export function EditableImage({ src, alt, className, style, onChange, isEditMode
   };
 
   return (
-    <div ref={wrapperRef} className={`editable-img-wrapper ${isEditMode ? 'editable-hover' : ''}`} style={{ position: 'relative', display: 'inline-block', ...style }}>
-      {isEditMode && <TopLeftResizer targetRef={wrapperRef} />}
+    <div 
+      ref={wrapperRef} 
+      className={`editable-img-wrapper ${isEditMode ? 'editable-hover' : ''}`} 
+      style={{ position: 'relative', display: 'inline-block', ...style }}
+      onMouseEnter={() => isEditMode && setIsHovered(true)}
+      onMouseLeave={() => isEditMode && setIsHovered(false)}
+    >
+      {isEditMode && isHovered && <TopLeftResizer targetRef={wrapperRef} />}
       <img 
         src={src} 
         alt={alt} 
@@ -173,6 +183,8 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
   const [isOpen, setIsOpen] = useState(false);
   const [inputText, setInputText] = useState(text || '');
   const [inputHref, setInputHref] = useState(href || '');
+  const [isHovered, setIsHovered] = useState(false);
+  const buttonRef = useRef(null);
 
   useEffect(() => {
     setInputText(text || '');
@@ -207,7 +219,13 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
   const isLink = Component === 'a' || typeof href === 'string';
 
   return (
-    <div style={{ position: 'relative', display: 'inline-block' }}>
+    <div 
+      ref={buttonRef}
+      style={{ position: 'relative', display: 'inline-block' }}
+      onMouseEnter={() => isEditMode && setIsHovered(true)}
+      onMouseLeave={() => isEditMode && setIsHovered(false)}
+    >
+      {isEditMode && isHovered && <TopLeftResizer targetRef={buttonRef} />}
       <Component 
         href={!isEditMode ? href : undefined} 
         className={`${className || ''} ${isEditMode ? 'editable-hover' : ''}`} 
