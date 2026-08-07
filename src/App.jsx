@@ -636,19 +636,34 @@ export default function App() {
 
       {/* Floating Save Bar for Edit Mode */}
       {editMode && (
-        <div className="floating-save-bar glass" style={{ background: 'rgba(255, 255, 255, 0.95)', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
+        <div className="floating-save-bar glass" style={{ background: 'rgba(255, 255, 255, 0.95)', border: '2px solid rgba(239, 68, 68, 0.5)', boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>Live Edit Mode Active</span>
-            <span style={{ fontSize: '11px', color: '#64748b' }}>Click text, images, or buttons to edit</span>
+            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#ef4444' }}>Live Edit Mode Active</span>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>Danger Zone: Changes affect live site</span>
           </div>
-          {unsavedChanges && (
-            <button className="pill primary" onClick={handleSaveData} style={{ animation: 'pulse 2s infinite' }}>
-              Publish Changes ✨
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              className="pill primary" 
+              onClick={handleSaveData} 
+              style={{ background: '#ef4444', opacity: unsavedChanges ? 1 : 0.5 }}
+              disabled={!unsavedChanges}
+            >
+              Save
             </button>
-          )}
-          <button className="pill glass" onClick={() => { setEditMode(false); setIsAdminLoggedIn(false); }}>
-            Exit
-          </button>
+            <button 
+              className="pill primary" 
+              onClick={() => { if (unsavedChanges) handleSaveData(); setEditMode(false); setIsAdminLoggedIn(false); }}
+              style={{ background: '#b91c1c' }}
+            >
+              Save & Exit
+            </button>
+            <button 
+              className="pill glass" 
+              onClick={() => { setEditMode(false); setIsAdminLoggedIn(false); }}
+            >
+              Exit
+            </button>
+          </div>
         </div>
       )}
     </div>
