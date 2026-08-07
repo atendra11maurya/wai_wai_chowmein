@@ -1,22 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './index.css'
-import portfolioData from './config/portfolioData.json'
+import defaultPortfolioData from './config/portfolioData.json'
 
-function Dialog({ customData, onClose }) {
+function Dialog({ customData, onClose, data }) {
   const [copied, setCopied] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
   const handleCopyEmail = () => {
-    navigator.clipboard.writeText(portfolioData.personal.email)
+    navigator.clipboard.writeText(data.personal.email)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   const handleFormSubmit = (e) => {
     e.preventDefault()
-    // Open mailto fallback or submit
-    const mailtoUrl = `mailto:${portfolioData.personal.email}?subject=Contact from Portfolio by ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(formData.message + '\n\nSender Email: ' + formData.email)}`
+    const mailtoUrl = `mailto:${data.personal.email}?subject=Contact from Portfolio by ${encodeURIComponent(formData.name)}&body=${encodeURIComponent(formData.message + '\n\nSender Email: ' + formData.email)}`
     window.open(mailtoUrl, '_blank')
     setFormSent(true)
     setTimeout(() => {
@@ -25,7 +24,7 @@ function Dialog({ customData, onClose }) {
     }, 2500)
   }
 
-  const whatsappUrl = `https://wa.me/${portfolioData.personal.whatsappNumber}?text=${encodeURIComponent(portfolioData.personal.whatsappMessage)}`
+  const whatsappUrl = `https://wa.me/${data.personal.whatsappNumber}?text=${encodeURIComponent(data.personal.whatsappMessage)}`
 
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
@@ -38,7 +37,7 @@ function Dialog({ customData, onClose }) {
       >
         <p className="eyebrow">{customData?.eyebrow || 'Connect & Collaborate'}</p>
         <h2 id="dialog-title">{customData?.title || 'Get in touch.'}</h2>
-        <p>{customData?.text || `Feel free to reach out to ${portfolioData.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
+        <p>{customData?.text || `Feel free to reach out to ${data.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
 
         {/* Quick WhatsApp Action Button */}
         <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
@@ -87,7 +86,7 @@ function Dialog({ customData, onClose }) {
 
         <div style={{ marginTop: '16px', background: 'rgba(2, 132, 199, 0.06)', padding: '14px', borderRadius: '16px', border: '1px solid rgba(2, 132, 199, 0.15)' }}>
           <p style={{ margin: '0 0 4px', fontSize: '11px', fontWeight: '700', color: '#0284c7', fontFamily: 'DM Mono, monospace' }}>DIRECT EMAIL</p>
-          <p style={{ margin: 0, fontWeight: '700', color: '#0a2540', fontSize: '14.5px' }}>{portfolioData.personal.email}</p>
+          <p style={{ margin: 0, fontWeight: '700', color: '#0a2540', fontSize: '14.5px' }}>{data.personal.email}</p>
         </div>
 
         <div className="modal-row" style={{ marginTop: '16px' }}>
@@ -96,7 +95,7 @@ function Dialog({ customData, onClose }) {
           </button>
           <a
             className="pill linkedin"
-            href={portfolioData.personal.linkedin}
+            href={data.personal.linkedin}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -111,12 +110,221 @@ function Dialog({ customData, onClose }) {
   )
 }
 
+function AdminDashboard({ portfolioData, onSave, onLogout }) {
+  const [formData, setFormData] = useState(portfolioData)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
+  const handlePersonalChange = (field, val) => {
+    setFormData({
+      ...formData,
+      personal: {
+        ...formData.personal,
+        [field]: val
+      }
+    })
+  }
+
+  const handleSave = () => {
+    onSave(formData)
+    setSaveSuccess(true)
+    setTimeout(() => setSaveSuccess(false), 3000)
+  }
+
+  const handleDownloadJSON = () => {
+    const jsonStr = JSON.stringify(formData, null, 2)
+    const blob = new Blob([jsonStr], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'portfolioData.json'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return (
+    <section className="events-page">
+      <header className="hero glass" style={{ minHeight: 'auto', padding: '36px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <p className="eyebrow">🔐 Admin Content Manager (Vercel Native)</p>
+            <h1 style={{ fontSize: 'clamp(28px, 4.5vw, 48px)', margin: '6px 0' }}>Website Admin Panel</h1>
+            <p className="intro" style={{ margin: 0 }}>
+              Edit personal details, WhatsApp number, email, links, and content below.
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button className="pill primary" onClick={handleSave}>
+              {saveSuccess ? '✓ Saved Live!' : '💾 Save & Apply'}
+            </button>
+            <button className="pill glass" onClick={handleDownloadJSON}>
+              📥 Export JSON
+            </button>
+            <button className="pill glass" onClick={onLogout} style={{ color: '#ef4444', borderColor: 'rgba(239,68,68,0.3)' }}>
+              🔒 Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Admin Form Grid */}
+      <div className="fest-container-card glass" style={{ marginTop: '24px', padding: '28px' }}>
+        <h3 style={{ fontSize: '20px', margin: '0 0 20px', color: '#0f172a' }}>👤 Personal & Brand Settings</h3>
+
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Full Name</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.name}
+              onChange={(e) => handlePersonalChange('name', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Short Name (Navbar)</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.shortName}
+              onChange={(e) => handlePersonalChange('shortName', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Email Address</label>
+            <input
+              type="email"
+              className="form-input"
+              value={formData.personal.email}
+              onChange={(e) => handlePersonalChange('email', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>WhatsApp Number (e.g. 919876543210)</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.whatsappNumber}
+              onChange={(e) => handlePersonalChange('whatsappNumber', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>LinkedIn URL</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.linkedin}
+              onChange={(e) => handlePersonalChange('linkedin', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>GitHub URL</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.github}
+              onChange={(e) => handlePersonalChange('github', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Resume File URL</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.resumeUrl}
+              onChange={(e) => handlePersonalChange('resumeUrl', e.target.value)}
+            />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Admin Password</label>
+            <input
+              type="text"
+              className="form-input"
+              value={formData.personal.adminPassword || 'admin123'}
+              onChange={(e) => handlePersonalChange('adminPassword', e.target.value)}
+            />
+          </div>
+        </div>
+
+        <div style={{ marginTop: '16px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Title & Tagline</label>
+          <input
+            type="text"
+            className="form-input"
+            value={formData.personal.title}
+            onChange={(e) => handlePersonalChange('title', e.target.value)}
+          />
+        </div>
+
+        <div style={{ marginTop: '16px' }}>
+          <label style={{ display: 'block', fontSize: '13px', fontWeight: '700', marginBottom: '6px', color: '#334155' }}>Summary / Bio</label>
+          <textarea
+            className="form-textarea"
+            rows="4"
+            value={formData.personal.summary}
+            onChange={(e) => handlePersonalChange('summary', e.target.value)}
+          ></textarea>
+        </div>
+
+        <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+          <button className="pill primary" onClick={handleSave}>
+            {saveSuccess ? '✓ Saved Live!' : '💾 Save Changes'}
+          </button>
+          <button className="pill glass" onClick={handleDownloadJSON}>
+            📥 Export Updated JSON File
+          </button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('home')
   const [activeDialog, setActiveDialog] = useState(null)
   const [customDialogData, setCustomDialogData] = useState(null)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [filter, setFilter] = useState('all')
+
+  // LocalStorage state persistence for live editing
+  const [portfolioData, setPortfolioData] = useState(() => {
+    const saved = localStorage.getItem('userPortfolioData')
+    if (saved) {
+      try {
+        return JSON.parse(saved)
+      } catch {
+        return defaultPortfolioData
+      }
+    }
+    return defaultPortfolioData
+  })
+
+  // Admin Login Authentication State
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
+  const [adminInputPassword, setAdminInputPassword] = useState('')
+  const [passwordError, setPasswordError] = useState(false)
+
+  // Handle URL hash or tab
+  useEffect(() => {
+    if (window.location.pathname.includes('/admin') || window.location.hash === '#admin') {
+      setActiveTab('admin')
+    }
+  }, [])
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault()
+    const correctPassword = portfolioData.personal.adminPassword || 'admin123'
+    if (adminInputPassword === correctPassword) {
+      setIsAdminLoggedIn(true)
+      setPasswordError(false)
+    } else {
+      setPasswordError(true)
+    }
+  }
+
+  const handleSaveData = (newData) => {
+    setPortfolioData(newData)
+    localStorage.setItem('userPortfolioData', JSON.stringify(newData))
+  }
 
   const openDialog = (customData = null) => {
     setCustomDialogData(customData)
@@ -151,6 +359,7 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
+          <button className={`pill ${activeTab === 'admin' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('admin')}>Admin 🔐</button>
           <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
@@ -172,6 +381,7 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
+          <button className={`pill ${activeTab === 'admin' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('admin')}>Admin 🔐</button>
           <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>Download CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
@@ -179,6 +389,46 @@ export default function App() {
 
       {/* Main View Router */}
       <main id="top">
+        {activeTab === 'admin' && (
+          !isAdminLoggedIn ? (
+            <div style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
+              <form className="modal glass" style={{ maxWidth: '420px', width: '100%', padding: '32px' }} onSubmit={handleAdminLogin}>
+                <p className="eyebrow">🔐 SECURE ADMIN LOGIN</p>
+                <h2 style={{ fontSize: '24px', margin: '8px 0 16px' }}>Enter Admin Password</h2>
+                <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 16px' }}>
+                  Default password is <code style={{ background: 'rgba(0,0,0,0.06)', padding: '2px 6px', borderRadius: '4px' }}>admin123</code>
+                </p>
+
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="Password"
+                  autoFocus
+                  required
+                  value={adminInputPassword}
+                  onChange={(e) => setAdminInputPassword(e.target.value)}
+                />
+
+                {passwordError && (
+                  <p style={{ color: '#ef4444', fontSize: '13px', margin: '8px 0 0', fontWeight: '700' }}>
+                    ❌ Incorrect password. Please try again.
+                  </p>
+                )}
+
+                <button type="submit" className="pill primary" style={{ width: '100%', marginTop: '16px', justifyContent: 'center' }}>
+                  Unlock Dashboard 🔓
+                </button>
+              </form>
+            </div>
+          ) : (
+            <AdminDashboard
+              portfolioData={portfolioData}
+              onSave={handleSaveData}
+              onLogout={() => setIsAdminLoggedIn(false)}
+            />
+          )
+        )}
+
         {activeTab === 'home' && (
           <>
             {/* Landing Hero Section */}
@@ -545,9 +795,12 @@ export default function App() {
         <span>© 2026 {portfolioData.personal.name.toUpperCase()} · {portfolioData.personal.location.toUpperCase()}</span>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
           <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
-          <a href="/admin/" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: '700', fontSize: '13px' }}>
+          <button
+            onClick={() => navigateToTab('admin')}
+            style={{ background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', fontWeight: '700', fontSize: '13px' }}
+          >
             Admin 🔐
-          </a>
+          </button>
         </div>
       </footer>
 
@@ -556,6 +809,7 @@ export default function App() {
         <Dialog
           customData={customDialogData}
           onClose={() => setActiveDialog(null)}
+          data={portfolioData}
         />
       )}
     </div>
