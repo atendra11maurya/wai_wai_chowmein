@@ -1,13 +1,13 @@
 # 🚀 Premium Developer Portfolio Template (with Admin CMS Dashboard)
 
-Welcome to your new portfolio website! This site is engineered with modern glassmorphism UI, lightning-fast Vite + React rendering, and an **Admin CMS Dashboard (`/admin`)** allowing non-developer buyers to manage their content effortlessly.
+Welcome to your new portfolio website! This site is engineered with modern glassmorphism UI, lightning-fast Vite + React rendering, and a **hidden Admin CMS Dashboard** allowing the site owner to manage all content effortlessly.
 
 ---
 
-## 🔐 How the Admin Dashboard (`/admin`) Works for Buyers
+## 🔐 How the Admin Dashboard Works
 
-Your buyers can manage their entire website by simply logging into:
-`https://theirwebsite.com/admin`
+The admin panel is hidden from public view. Access it at:
+`https://yourwebsite.com/deesign`
 
 ### What they can edit inside the Admin Dashboard:
 - 👤 **Personal Info**: Change Name, Title, Location, Bio, WhatsApp number, Email, LinkedIn, GitHub.

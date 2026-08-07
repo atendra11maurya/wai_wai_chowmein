@@ -101,9 +101,9 @@ export default function App() {
   const [adminInputPassword, setAdminInputPassword] = useState('')
   const [passwordError, setPasswordError] = useState(false)
 
-  // Handle URL hash or tab
+  // Handle secret admin URL
   useEffect(() => {
-    if (window.location.pathname.includes('/admin') || window.location.hash === '#admin') {
+    if (window.location.pathname.includes('/deesign') || window.location.hash === '#deesign') {
       setActiveTab('admin')
     }
   }, [])
@@ -157,7 +157,6 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
-          <button className={`pill ${activeTab === 'admin' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('admin')}>Admin 🔐</button>
           <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
@@ -179,7 +178,6 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
-          <button className={`pill ${activeTab === 'admin' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('admin')}>Admin 🔐</button>
           <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>Download CV 📥</a>
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
@@ -591,15 +589,7 @@ export default function App() {
       {/* Footer */}
       <footer>
         <span>© 2026 {portfolioData.personal.name.toUpperCase()} · {portfolioData.personal.location.toUpperCase()}</span>
-        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
-          <button
-            onClick={() => navigateToTab('admin')}
-            style={{ background: 'none', border: 'none', color: '#0284c7', cursor: 'pointer', fontWeight: '700', fontSize: '13px' }}
-          >
-            Admin 🔐
-          </button>
-        </div>
+        <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
       </footer>
 
       {/* Contact Dialog */}
