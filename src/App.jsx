@@ -4,7 +4,7 @@ import './inline-editing.css'
 import defaultPortfolioData from './config/portfolioData.json'
 import { EditableText, EditableImage, EditableButton } from './InlineEditors'
 
-function Dialog({ customData, onClose, data }) {
+function Dialog({ customData, onClose, data, editMode, updateData }) {
   const [copied, setCopied] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -35,9 +35,9 @@ function Dialog({ customData, onClose, data }) {
         aria-labelledby="dialog-title"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <p className="eyebrow">{customData?.eyebrow || 'Connect & Collaborate'}</p>
-        <h2 id="dialog-title">{customData?.title || 'Get in touch.'}</h2>
-        <p>{customData?.text || `Feel free to reach out to ${data.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
+        <EditableText tag="p" className="eyebrow" value={customData?.eyebrow || data.personal.contactEyebrow} onChange={(val) => !customData && updateData('personal.contactEyebrow', val)} isEditMode={!customData && editMode} />
+        <EditableText tag="h2" id="dialog-title" value={customData?.title || data.personal.contactTitle} onChange={(val) => !customData && updateData('personal.contactTitle', val)} isEditMode={!customData && editMode} />
+        <EditableText tag="p" value={customData?.text || data.personal.contactText} onChange={(val) => !customData && updateData('personal.contactText', val)} isEditMode={!customData && editMode} />
 
         <form className="contact-form" onSubmit={handleFormSubmit}>
           <input type="text" className="form-input" placeholder="Your Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
@@ -126,9 +126,35 @@ export default function App() {
     setUnsavedChanges(true);
   }
 
-  const handleSaveData = () => {
+  const [isSaving, setIsSaving] = useState(false)
+
+  const handleSaveData = async () => {
+    setIsSaving(true)
+    
+    // Fallback save to local storage immediately
     localStorage.setItem('userPortfolioData', JSON.stringify(portfolioData))
-    setUnsavedChanges(false)
+
+    try {
+      const response = await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(portfolioData)
+      });
+      
+      const result = await response.json();
+      if (!response.ok) {
+        console.error('Save failed:', result.error);
+        alert(`Failed to push to GitHub: ${result.error}`);
+      } else {
+        console.log('Save successful:', result.message);
+      }
+    } catch (error) {
+      console.error('Network error saving data:', error);
+      alert('Network error while pushing to GitHub. Data saved locally.');
+    } finally {
+      setIsSaving(false)
+      setUnsavedChanges(false)
+    }
   }
 
   const handleExitEditMode = () => {
@@ -168,8 +194,8 @@ export default function App() {
       {/* Translucent Glass Navigation Bar */}
       <nav className="glass navbar">
         <a className="brand" href="#home" onClick={(e) => { e.preventDefault(); navigateToTab('home'); }}>
-          <div className="brand-avatar">{portfolioData.personal.avatarInitials}</div>
-          <span>{portfolioData.personal.shortName.split('.')[0]}<span className="brand-accent">.</span>{portfolioData.personal.shortName.split('.')[1] || 'v'}</span>
+          <EditableText tag="div" className="brand-avatar" value={portfolioData.personal.avatarInitials} onChange={(val) => updateData('personal.avatarInitials', val)} isEditMode={editMode} />
+          <EditableText tag="span" value={portfolioData.personal.shortName} onChange={(val) => updateData('personal.shortName', val)} isEditMode={editMode} />
         </a>
 
         <div className="nav-links">
@@ -178,7 +204,7 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
-          <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>CV 📥</a>
+          <EditableButton as="a" className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download text="CV 📥" onChange={(val) => updateData('personal.resumeUrl', val.href)} isEditMode={editMode} />
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
 
@@ -199,7 +225,7 @@ export default function App() {
           <button className={`pill ${activeTab === 'projects' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('projects')}>Projects ({portfolioData.projects.length})</button>
           <button className={`pill ${activeTab === 'education' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('education')}>Education ({portfolioData.education.length})</button>
           <button className={`pill ${activeTab === 'skills' ? 'primary' : 'glass'}`} onClick={() => navigateToTab('skills')}>Skills & Certs</button>
-          <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>Download CV 📥</a>
+          <EditableButton as="a" className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download text="Download CV 📥" onChange={(val) => updateData('personal.resumeUrl', val.href)} isEditMode={editMode} />
           <button className="pill primary cta" onClick={() => openDialog()}>Contact ↗</button>
         </div>
       </nav>
@@ -637,8 +663,8 @@ export default function App() {
 
       {/* Footer */}
       <footer>
-        <span>© 2026 {portfolioData.personal.name.toUpperCase()} · {portfolioData.personal.location.toUpperCase()}</span>
-        <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
+        <span>© 2026 <EditableText tag="span" value={portfolioData.personal.name.toUpperCase()} onChange={(val) => updateData('personal.name', val.toLowerCase())} isEditMode={editMode} /> · <EditableText tag="span" value={portfolioData.personal.location.toUpperCase()} onChange={(val) => updateData('personal.location', val.toLowerCase())} isEditMode={editMode} /></span>
+        <EditableText tag="span" value="AI · RESEARCH · SOFTWARE DEVELOPMENT" onChange={() => {}} isEditMode={editMode} />
       </footer>
 
       {/* Contact Dialog */}
@@ -647,6 +673,8 @@ export default function App() {
           customData={customDialogData}
           onClose={() => setActiveDialog(null)}
           data={portfolioData}
+          editMode={editMode}
+          updateData={updateData}
         />
       )}
 
@@ -661,17 +689,21 @@ export default function App() {
             <button 
               className="pill primary" 
               onClick={handleSaveData} 
-              style={{ background: '#ef4444', opacity: unsavedChanges ? 1 : 0.5 }}
-              disabled={!unsavedChanges}
+              style={{ background: '#ef4444', opacity: (unsavedChanges && !isSaving) ? 1 : 0.5 }}
+              disabled={!unsavedChanges || isSaving}
             >
-              Save
+              {isSaving ? 'Pushing...' : 'Save'}
             </button>
             <button 
               className="pill primary" 
-              onClick={() => { if (unsavedChanges) handleSaveData(); handleExitEditMode(); }}
-              style={{ background: '#b91c1c' }}
+              onClick={async () => { 
+                if (unsavedChanges) await handleSaveData(); 
+                handleExitEditMode(); 
+              }}
+              style={{ background: '#b91c1c', opacity: isSaving ? 0.5 : 1 }}
+              disabled={isSaving}
             >
-              Save & Exit
+              {isSaving ? 'Pushing...' : 'Save & Exit'}
             </button>
             <button 
               className="pill glass" 
