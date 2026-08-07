@@ -1,0 +1,72 @@
+/* --- INLINE EDITING STYLES --- */
+.editable-hover {
+  outline: 2px dashed transparent;
+  outline-offset: 4px;
+  transition: outline 0.2s ease, transform 0.2s ease;
+  border-radius: 4px;
+}
+.editable-img-wrapper {
+  resize: both;
+  overflow: hidden;
+  display: inline-block;
+}
+.editable-hover:hover {
+  outline-color: #3b82f6;
+  transform: scale(1.02);
+}
+
+.editable-text {
+  outline: 2px dashed transparent;
+  outline-offset: 4px;
+  transition: outline 0.2s ease, background 0.2s ease;
+  border-radius: 4px;
+  cursor: text;
+  min-width: 1ch;
+  display: inline-block;
+  resize: both;
+  overflow: hidden;
+}
+.editable-text:hover {
+  outline-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.05);
+}
+.editable-text:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 4px;
+  background: rgba(59, 130, 246, 0.1);
+}
+.editable-text:empty:before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.editable-popover {
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-save-bar {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-radius: 999px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUpFade 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popIn {
+  from { opacity: 0; transform: translate(-50%, -40%) scale(0.95); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}

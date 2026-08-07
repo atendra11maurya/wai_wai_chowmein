@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import './index.css'
+import './inline-editing.css'
 import defaultPortfolioData from './config/portfolioData.json'
-import AdminDashboard from './AdminDashboard'
+import { EditableText, EditableImage, EditableButton } from './InlineEditors'
 
 function Dialog({ customData, onClose, data }) {
   const [copied, setCopied] = useState(false)
@@ -86,6 +87,10 @@ export default function App() {
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const [adminInputPassword, setAdminInputPassword] = useState('')
   const [passwordError, setPasswordError] = useState(false)
+  
+  // Inline Editing State
+  const [editMode, setEditMode] = useState(false)
+  const [unsavedChanges, setUnsavedChanges] = useState(false)
 
   // Handle secret admin URL
   useEffect(() => {
@@ -100,14 +105,30 @@ export default function App() {
     if (adminInputPassword === correctPassword) {
       setIsAdminLoggedIn(true)
       setPasswordError(false)
+      setEditMode(true)
+      setActiveTab('home') // Switch immediately to home to start editing
     } else {
       setPasswordError(true)
     }
   }
 
-  const handleSaveData = (newData) => {
-    setPortfolioData(newData)
-    localStorage.setItem('userPortfolioData', JSON.stringify(newData))
+  const updateData = (path, value) => {
+    setPortfolioData((prev) => {
+      const newData = JSON.parse(JSON.stringify(prev));
+      const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+      let current = newData;
+      for (let i = 0; i < keys.length - 1; i++) {
+        current = current[keys[i]];
+      }
+      current[keys[keys.length - 1]] = value;
+      return newData;
+    });
+    setUnsavedChanges(true);
+  }
+
+  const handleSaveData = () => {
+    localStorage.setItem('userPortfolioData', JSON.stringify(portfolioData))
+    setUnsavedChanges(false)
   }
 
   const openDialog = (customData = null) => {
@@ -170,13 +191,13 @@ export default function App() {
       {/* Main View Router */}
       <main id="top">
         {activeTab === 'admin' && (
-          !isAdminLoggedIn ? (
+          !isAdminLoggedIn && (
             <div style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}>
               <form className="modal glass" style={{ maxWidth: '420px', width: '100%', padding: '32px' }} onSubmit={handleAdminLogin}>
                 <p className="eyebrow">🔐 SECURE ADMIN LOGIN</p>
                 <h2 style={{ fontSize: '24px', margin: '8px 0 16px' }}>Enter Admin Password</h2>
                 <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 16px' }}>
-                  Please enter your password to edit website content.
+                  Please enter your password to enable inline edit mode.
                 </p>
 
                 <input
@@ -196,16 +217,10 @@ export default function App() {
                 )}
 
                 <button type="submit" className="pill primary" style={{ width: '100%', marginTop: '16px', justifyContent: 'center' }}>
-                  Unlock Dashboard 🔓
+                  Enable Edit Mode 🔓
                 </button>
               </form>
             </div>
-          ) : (
-            <AdminDashboard
-              portfolioData={portfolioData}
-              onSave={handleSaveData}
-              onLogout={() => setIsAdminLoggedIn(false)}
-            />
           )
         )}
 
@@ -215,18 +230,39 @@ export default function App() {
             <section className="hero glass">
               <div className="hero-content-layout">
                 <div className="hero-text-block">
-                  <h1 className="hero-name">{portfolioData.personal.name}</h1>
+                  <EditableText 
+                    tag="h1" 
+                    className="hero-name" 
+                    value={portfolioData.personal.name} 
+                    onChange={(val) => updateData('personal.name', val)}
+                    isEditMode={editMode} 
+                  />
                   <div className="hero-role-title">
-                    <span>{portfolioData.personal.title}</span>
+                    <EditableText 
+                      tag="span" 
+                      value={portfolioData.personal.title} 
+                      onChange={(val) => updateData('personal.title', val)}
+                      isEditMode={editMode} 
+                    />
                   </div>
                   <div className="hero-bio">
-                    <p style={{ margin: '14px 0 0', color: '#475569', fontSize: '15px', lineHeight: '1.65' }}>
-                      {portfolioData.personal.summary}
-                    </p>
+                    <EditableText 
+                      tag="p" 
+                      style={{ margin: '14px 0 0', color: '#475569', fontSize: '15px', lineHeight: '1.65' }}
+                      value={portfolioData.personal.summary} 
+                      onChange={(val) => updateData('personal.summary', val)}
+                      isEditMode={editMode} 
+                    />
                   </div>
                 </div>
                 <div className="hero-avatar-wrapper">
-                  <img src={portfolioData.personal.avatarImage} alt={`${portfolioData.personal.name} Avatar`} className="hero-avatar-3d" />
+                  <EditableImage 
+                    src={portfolioData.personal.avatarImage} 
+                    alt={`${portfolioData.personal.name} Avatar`} 
+                    className="hero-avatar-3d" 
+                    onChange={(val) => updateData('personal.avatarImage', val)}
+                    isEditMode={editMode} 
+                  />
                 </div>
               </div>
             </section>
@@ -234,12 +270,27 @@ export default function App() {
             {/* Standalone Equal Full-Width Hero Action Buttons */}
             <div className="hero-actions-standalone">
               <button className="pill hero-primary-btn" onClick={() => navigateToTab('experience')}>Explore 12+ Experiences →</button>
-              <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>
-                Download Resume PDF 📥
-              </a>
-              <a className="pill linkedin" href={portfolioData.personal.linkedin} target="_blank" rel="noopener noreferrer">
-                LinkedIn ↗
-              </a>
+              <EditableButton 
+                as="a" 
+                className="pill glass" 
+                href={portfolioData.personal.resumeUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                download
+                text="Download Resume PDF 📥"
+                onChange={(val) => updateData('personal.resumeUrl', val.href)}
+                isEditMode={editMode} 
+              />
+              <EditableButton 
+                as="a" 
+                className="pill linkedin" 
+                href={portfolioData.personal.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                text="LinkedIn ↗"
+                onChange={(val) => updateData('personal.linkedin', val.href)}
+                isEditMode={editMode} 
+              />
               <button className="pill glass" onClick={() => openDialog()}>
                 Get in Touch ✉️
               </button>
@@ -260,7 +311,7 @@ export default function App() {
               </div>
 
               <div className="fest-sub-rows">
-                {portfolioData.topAchievements.map((item) => (
+                {portfolioData.topAchievements.map((item, idx) => (
                   <div
                     key={item.id}
                     className="fest-row-card glass"
@@ -272,16 +323,20 @@ export default function App() {
                     }}
                   >
                     <div className="row-card-content">
-                      <span className="row-card-icon">{item.icon}</span>
+                      <EditableText tag="span" className="row-card-icon" value={item.icon} onChange={(val) => updateData(`topAchievements[${idx}].icon`, val)} isEditMode={editMode} />
                       <div className="row-card-info">
-                        <span className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }}>{item.badge}</span>
-                        <h3>{item.title}</h3>
-                        <p>{item.description}</p>
+                        <EditableText tag="span" className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }} value={item.badge} onChange={(val) => updateData(`topAchievements[${idx}].badge`, val)} isEditMode={editMode} />
+                        <EditableText tag="h3" value={item.title} onChange={(val) => updateData(`topAchievements[${idx}].title`, val)} isEditMode={editMode} />
+                        <EditableText tag="p" value={item.description} onChange={(val) => updateData(`topAchievements[${idx}].description`, val)} isEditMode={editMode} />
                       </div>
                     </div>
                     <div className="row-card-action">
-                      <button
+                      <EditableButton
+                        as="button"
                         className="pill primary row-action-btn"
+                        text={item.actionText}
+                        onChange={(val) => updateData(`topAchievements[${idx}].actionText`, val.text)}
+                        isEditMode={editMode}
                         onClick={(e) => {
                           e.stopPropagation()
                           if (item.id === 'hcl') navigateToTab('experience')
@@ -289,9 +344,7 @@ export default function App() {
                           else if (item.id === 'iiit') navigateToTab('education')
                           else navigateToTab('projects')
                         }}
-                      >
-                        {item.actionText}
-                      </button>
+                      />
                     </div>
                   </div>
                 ))}
@@ -311,12 +364,16 @@ export default function App() {
               <div className="testimonials-grid">
                 {portfolioData.testimonials.map((item, idx) => (
                   <div key={idx} className="testimonial-card glass">
-                    <div className="testimonial-quote">"{item.quote}"</div>
+                    <div className="testimonial-quote">
+                      "<EditableText tag="span" value={item.quote} onChange={(val) => updateData(`testimonials[${idx}].quote`, val)} isEditMode={editMode} />"
+                    </div>
                     <div className="testimonial-author">
-                      <div className="testimonial-avatar">{item.avatar}</div>
+                      <div className="testimonial-avatar">
+                        <EditableText tag="span" value={item.avatar} onChange={(val) => updateData(`testimonials[${idx}].avatar`, val)} isEditMode={editMode} />
+                      </div>
                       <div className="testimonial-info">
-                        <h4>{item.author}</h4>
-                        <p>{item.title}</p>
+                        <EditableText tag="h4" value={item.author} onChange={(val) => updateData(`testimonials[${idx}].author`, val)} isEditMode={editMode} />
+                        <EditableText tag="p" value={item.title} onChange={(val) => updateData(`testimonials[${idx}].title`, val)} isEditMode={editMode} />
                       </div>
                     </div>
                   </div>
@@ -371,7 +428,9 @@ export default function App() {
             </header>
 
             <div className="trajectory-wrapper">
-              {filteredExperiences.map((exp, idx) => (
+              {filteredExperiences.map((exp, idx) => {
+                const globalIdx = portfolioData.experiences.findIndex(e => e.id === exp.id);
+                return (
                 <div key={exp.id} className="trajectory-step-container">
                   <div className="trajectory-node-column">
                     <div className="trajectory-dot"></div>
@@ -380,33 +439,37 @@ export default function App() {
 
                   <div
                     className="trajectory-card glass"
-                    onClick={() => openDialog({ eyebrow: exp.company, title: exp.role, text: exp.details.join(' ') })}
-                    style={{ cursor: 'pointer' }}
+                    onClick={() => !editMode && openDialog({ eyebrow: exp.company, title: exp.role, text: exp.details.join(' ') })}
+                    style={{ cursor: editMode ? 'default' : 'pointer' }}
                   >
                     <div className="trajectory-card-header">
-                      <span className="fest-eyebrow-badge">{exp.company}</span>
-                      <span className="date-text" style={{ margin: 0 }}>🗓️ {exp.period}</span>
+                      <EditableText tag="span" className="fest-eyebrow-badge" value={exp.company} onChange={(val) => updateData(`experiences[${globalIdx}].company`, val)} isEditMode={editMode} />
+                      <EditableText tag="span" className="date-text" style={{ margin: 0 }} value={`🗓️ ${exp.period}`} onChange={(val) => updateData(`experiences[${globalIdx}].period`, val.replace('🗓️ ', ''))} isEditMode={editMode} />
                     </div>
 
-                    <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)' }}>
-                      {exp.icon} {exp.role}
+                    <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                      <EditableText tag="span" value={exp.icon} onChange={(val) => updateData(`experiences[${globalIdx}].icon`, val)} isEditMode={editMode} />
+                      <EditableText tag="span" value={exp.role} onChange={(val) => updateData(`experiences[${globalIdx}].role`, val)} isEditMode={editMode} />
                     </h2>
-                    <div className="trajectory-institution">📍 {exp.location}</div>
+                    <div className="trajectory-institution">
+                      <EditableText tag="span" value={`📍 ${exp.location}`} onChange={(val) => updateData(`experiences[${globalIdx}].location`, val.replace('📍 ', ''))} isEditMode={editMode} />
+                    </div>
 
                     <ul style={{ margin: '0 0 16px', paddingLeft: '20px', color: '#475569', fontSize: '14px', lineHeight: '1.65' }}>
                       {exp.details.map((point, pIdx) => (
-                        <li key={pIdx} style={{ marginBottom: '4px' }}>{point}</li>
+                        <EditableText key={pIdx} tag="li" style={{ marginBottom: '4px' }} value={point} onChange={(val) => updateData(`experiences[${globalIdx}].details[${pIdx}]`, val)} isEditMode={editMode} />
                       ))}
                     </ul>
 
                     <div className="trajectory-footer" style={{ flexWrap: 'wrap' }}>
                       {exp.tags.map((t, tIdx) => (
-                        <span key={tIdx} className="tag-pill">{t}</span>
+                        <EditableText key={tIdx} tag="span" className="tag-pill" value={t} onChange={(val) => updateData(`experiences[${globalIdx}].tags[${tIdx}]`, val)} isEditMode={editMode} />
                       ))}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </section>
         )}
@@ -568,6 +631,24 @@ export default function App() {
           onClose={() => setActiveDialog(null)}
           data={portfolioData}
         />
+      )}
+
+      {/* Floating Save Bar for Edit Mode */}
+      {editMode && (
+        <div className="floating-save-bar glass" style={{ background: 'rgba(255, 255, 255, 0.95)', border: '1px solid rgba(0, 0, 0, 0.08)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
+            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#0f172a' }}>Live Edit Mode Active</span>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>Click text, images, or buttons to edit</span>
+          </div>
+          {unsavedChanges && (
+            <button className="pill primary" onClick={handleSaveData} style={{ animation: 'pulse 2s infinite' }}>
+              Publish Changes ✨
+            </button>
+          )}
+          <button className="pill glass" onClick={() => { setEditMode(false); setIsAdminLoggedIn(false); }}>
+            Exit
+          </button>
+        </div>
       )}
     </div>
   )
