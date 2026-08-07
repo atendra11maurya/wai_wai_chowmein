@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './index.css'
 import './inline-editing.css'
 import defaultPortfolioData from './config/portfolioData.json'
@@ -82,6 +82,14 @@ export default function App() {
     }
     return defaultPortfolioData
   })
+  // Keep the latest edit available synchronously. A click on Save causes the
+  // edited field to blur first; React has not necessarily rendered that blur
+  // update by the time the button handler runs.
+  const portfolioDataRef = useRef(portfolioData)
+
+  useEffect(() => {
+    portfolioDataRef.current = portfolioData
+  }, [portfolioData])
 
   // Admin Login Authentication State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
@@ -91,6 +99,7 @@ export default function App() {
   // Inline Editing State
   const [editMode, setEditMode] = useState(false)
   const [unsavedChanges, setUnsavedChanges] = useState(false)
+  const [saveStatus, setSaveStatus] = useState('')
 
   // Handle secret admin URL
   useEffect(() => {
@@ -113,47 +122,55 @@ export default function App() {
   }
 
   const updateData = (path, value) => {
-    setPortfolioData((prev) => {
-      const newData = JSON.parse(JSON.stringify(prev));
-      const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-      let current = newData;
-      for (let i = 0; i < keys.length - 1; i++) {
-        current = current[keys[i]];
-      }
-      current[keys[keys.length - 1]] = value;
-      return newData;
-    });
+    const newData = JSON.parse(JSON.stringify(portfolioDataRef.current));
+    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
+    let current = newData;
+    for (let i = 0; i < keys.length - 1; i++) {
+      current = current[keys[i]];
+    }
+    current[keys[keys.length - 1]] = value;
+    portfolioDataRef.current = newData;
+    setPortfolioData(newData);
     setUnsavedChanges(true);
+    setSaveStatus('Unsaved changes')
   }
 
   const [isSaving, setIsSaving] = useState(false)
 
   const handleSaveData = async () => {
     setIsSaving(true)
+    setSaveStatus('Saving…')
+    const dataToSave = portfolioDataRef.current
     
     // Fallback save to local storage immediately
-    localStorage.setItem('userPortfolioData', JSON.stringify(portfolioData))
+    localStorage.setItem('userPortfolioData', JSON.stringify(dataToSave))
 
     try {
       const response = await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(portfolioData)
+        body: JSON.stringify(dataToSave)
       });
       
       const result = await response.json();
       if (!response.ok) {
         console.error('Save failed:', result.error);
+        setSaveStatus('Could not publish changes. They are saved in this browser.')
         alert(`Failed to push to GitHub: ${result.error}`);
+        return false
       } else {
         console.log('Save successful:', result.message);
+        setUnsavedChanges(false)
+        setSaveStatus('Saved. The live site will update after deployment finishes.')
+        return true
       }
     } catch (error) {
       console.error('Network error saving data:', error);
+      setSaveStatus('Could not publish changes. They are saved in this browser.')
       alert('Network error while pushing to GitHub. Data saved locally.');
+      return false
     } finally {
       setIsSaving(false)
-      setUnsavedChanges(false)
     }
   }
 
@@ -161,11 +178,15 @@ export default function App() {
     const saved = localStorage.getItem('userPortfolioData')
     if (saved) {
       try {
-        setPortfolioData(JSON.parse(saved))
+        const savedData = JSON.parse(saved)
+        portfolioDataRef.current = savedData
+        setPortfolioData(savedData)
       } catch {
+        portfolioDataRef.current = defaultPortfolioData
         setPortfolioData(defaultPortfolioData)
       }
     } else {
+      portfolioDataRef.current = defaultPortfolioData
       setPortfolioData(defaultPortfolioData)
     }
     setEditMode(false)
@@ -683,7 +704,7 @@ export default function App() {
         <div className="floating-save-bar glass" style={{ background: 'rgba(255, 255, 255, 0.95)', border: '2px solid rgba(239, 68, 68, 0.5)', boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
             <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#ef4444' }}>Live Edit Mode Active</span>
-            <span style={{ fontSize: '11px', color: '#64748b' }}>Danger Zone: Changes affect live site</span>
+            <span style={{ fontSize: '11px', color: '#64748b' }}>{saveStatus || 'Changes are not published until you save'}</span>
           </div>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
@@ -697,8 +718,8 @@ export default function App() {
             <button 
               className="pill primary" 
               onClick={async () => { 
-                if (unsavedChanges) await handleSaveData(); 
-                handleExitEditMode(); 
+                if (unsavedChanges && !(await handleSaveData())) return
+                handleExitEditMode()
               }}
               style={{ background: '#b91c1c', opacity: isSaving ? 0.5 : 1 }}
               disabled={isSaving}
