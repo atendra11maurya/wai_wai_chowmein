@@ -543,7 +543,12 @@ export default function App() {
       {/* Footer */}
       <footer>
         <span>© 2026 {portfolioData.personal.name.toUpperCase()} · {portfolioData.personal.location.toUpperCase()}</span>
-        <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span>AI · RESEARCH · SOFTWARE DEVELOPMENT</span>
+          <a href="/admin/" style={{ color: '#0284c7', textDecoration: 'none', fontWeight: '700', fontSize: '13px' }}>
+            Admin 🔐
+          </a>
+        </div>
       </footer>
 
       {/* Contact Dialog */}
