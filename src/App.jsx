@@ -25,8 +25,6 @@ function Dialog({ customData, onClose, data }) {
     }, 2500)
   }
 
-  const whatsappUrl = `https://wa.me/${data.personal.whatsappNumber}?text=${encodeURIComponent(data.personal.whatsappMessage)}`
-
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
@@ -39,18 +37,6 @@ function Dialog({ customData, onClose, data }) {
         <p className="eyebrow">{customData?.eyebrow || 'Connect & Collaborate'}</p>
         <h2 id="dialog-title">{customData?.title || 'Get in touch.'}</h2>
         <p>{customData?.text || `Feel free to reach out to ${data.personal.name} for software development opportunities, AI projects, or research collaborations.`}</p>
-
-        <div style={{ marginTop: '16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-          <a
-            className="pill whatsapp"
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ width: '100%', justifyContent: 'center', textAlign: 'center', fontSize: '15px' }}
-          >
-            💬 Chat instantly on WhatsApp ↗
-          </a>
-        </div>
 
         <form className="contact-form" onSubmit={handleFormSubmit}>
           <input type="text" className="form-input" placeholder="Your Name" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} />
@@ -139,8 +125,6 @@ export default function App() {
   const filteredExperiences = filter === 'all'
     ? portfolioData.experiences
     : portfolioData.experiences.filter(exp => exp.category === filter)
-
-  const whatsappUrl = `https://wa.me/${portfolioData.personal.whatsappNumber}?text=${encodeURIComponent(portfolioData.personal.whatsappMessage)}`
 
   return (
     <div className="shell min-h-screen">
@@ -250,9 +234,6 @@ export default function App() {
             {/* Standalone Equal Full-Width Hero Action Buttons */}
             <div className="hero-actions-standalone">
               <button className="pill hero-primary-btn" onClick={() => navigateToTab('experience')}>Explore 12+ Experiences →</button>
-              <a className="pill whatsapp" href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                WhatsApp Chat 💬
-              </a>
               <a className="pill glass" href={portfolioData.personal.resumeUrl} target="_blank" rel="noopener noreferrer" download>
                 Download Resume PDF 📥
               </a>
@@ -264,18 +245,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Impact Metrics Grid Counter */}
-            <section className="metrics-section">
-              <div className="metrics-grid">
-                {portfolioData.impactMetrics.map((metric, idx) => (
-                  <div key={idx} className="metric-card glass">
-                    <div className="metric-value">{metric.value}</div>
-                    <div className="metric-label">{metric.label}</div>
-                    <div className="metric-subtext">{metric.subtext}</div>
-                  </div>
-                ))}
-              </div>
-            </section>
 
             {/* LANDING PAGE EXCLUSIVE: Biggest Achievements Spotlight */}
             <section className="fest-container-card glass">
