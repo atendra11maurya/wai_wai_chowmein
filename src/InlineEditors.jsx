@@ -1,6 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 
+import { createPortal } from 'react-dom';
+
 function TopLeftResizer({ targetRef }) {
+  const [rect, setRect] = useState(null);
+
+  useEffect(() => {
+    const target = targetRef.current;
+    if (!target) return;
+
+    const updateRect = () => {
+      setRect(target.getBoundingClientRect());
+    };
+
+    updateRect();
+    window.addEventListener('resize', updateRect);
+    window.addEventListener('scroll', updateRect, true);
+    
+    const ro = new ResizeObserver(updateRect);
+    ro.observe(target);
+
+    return () => {
+      window.removeEventListener('resize', updateRect);
+      window.removeEventListener('scroll', updateRect, true);
+      ro.disconnect();
+    };
+  }, [targetRef]);
+
   const handleMouseDown = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -28,23 +54,26 @@ function TopLeftResizer({ targetRef }) {
     document.addEventListener('mouseup', handleMouseUp);
   };
 
-  return (
+  if (!rect) return null;
+
+  return createPortal(
     <div
       contentEditable={false}
       onMouseDown={handleMouseDown}
       style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
+        position: 'fixed',
+        top: rect.top,
+        left: rect.left,
         width: '10px',
         height: '10px',
         background: '#3b82f6',
         cursor: 'nwse-resize',
-        zIndex: 10,
+        zIndex: 99999,
         transform: 'translate(-50%, -50%)',
         borderRadius: '50%'
       }}
-    />
+    />,
+    document.body
   );
 }
 
