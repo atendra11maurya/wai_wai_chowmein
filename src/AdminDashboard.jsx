@@ -259,33 +259,6 @@ export default function AdminDashboard({ portfolioData, onSave, onLogout }) {
             </section>
           </EditableOverlay>
 
-          {/* Impact Metrics - Editable */}
-          <section className="metrics-section">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <h3 style={{ margin: 0, fontSize: '16px', color: '#64748b' }}>📊 Impact Metrics</h3>
-              <button className="admin-inline-btn add" onClick={() => addItem('impactMetrics', { value: '0+', label: 'New Metric', subtext: 'Description' })}>+ Add Metric</button>
-            </div>
-            <div className="metrics-grid">
-              {data.impactMetrics.map((metric, idx) => (
-                <EditableOverlay
-                  key={idx}
-                  onEdit={() => setEditModal({
-                    title: 'Edit Metric',
-                    fields: metricFields,
-                    data: metric,
-                    onSave: (newData) => updateItem('impactMetrics', idx, newData)
-                  })}
-                  onDelete={() => deleteItem('impactMetrics', idx)}
-                >
-                  <div className="metric-card glass">
-                    <div className="metric-value">{metric.value}</div>
-                    <div className="metric-label">{metric.label}</div>
-                    <div className="metric-subtext">{metric.subtext}</div>
-                  </div>
-                </EditableOverlay>
-              ))}
-            </div>
-          </section>
 
           {/* Top Achievements - Editable */}
           <section className="fest-container-card glass">
