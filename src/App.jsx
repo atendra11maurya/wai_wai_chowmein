@@ -110,7 +110,7 @@ export default function App() {
 
   const handleAdminLogin = (e) => {
     e.preventDefault()
-    const correctPassword = portfolioData.personal.adminPassword || 'admin123'
+    const correctPassword = portfolioData.personal.adminPassword || '4545amber5454'
     if (adminInputPassword === correctPassword) {
       setIsAdminLoggedIn(true)
       setPasswordError(false)
@@ -192,7 +192,7 @@ export default function App() {
                 <p className="eyebrow">🔐 SECURE ADMIN LOGIN</p>
                 <h2 style={{ fontSize: '24px', margin: '8px 0 16px' }}>Enter Admin Password</h2>
                 <p style={{ fontSize: '13.5px', color: '#64748b', margin: '0 0 16px' }}>
-                  Default password is <code style={{ background: 'rgba(0,0,0,0.06)', padding: '2px 6px', borderRadius: '4px' }}>admin123</code>
+                  Please enter your password to edit website content.
                 </p>
 
                 <input
