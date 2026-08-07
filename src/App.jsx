@@ -493,30 +493,24 @@ export default function App() {
                 {portfolioData.projects.map((proj, idx) => (
                   <div key={idx} className="fest-row-card glass">
                     <div className="row-card-content">
-                      <span className="row-card-icon">{proj.icon}</span>
+                      <EditableText tag="span" className="row-card-icon" value={proj.icon} onChange={(val) => updateData(`projects[${idx}].icon`, val)} isEditMode={editMode} />
                       <div className="row-card-info">
-                        <span className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }}>{proj.badge}</span>
-                        <h3>{proj.title}</h3>
-                        <p>{proj.desc}</p>
+                        <EditableText tag="span" className="eyebrow" style={{ fontSize: '10px', marginBottom: '2px', display: 'inline-block' }} value={proj.badge} onChange={(val) => updateData(`projects[${idx}].badge`, val)} isEditMode={editMode} />
+                        <EditableText tag="h3" value={proj.title} onChange={(val) => updateData(`projects[${idx}].title`, val)} isEditMode={editMode} />
+                        <EditableText tag="p" value={proj.desc} onChange={(val) => updateData(`projects[${idx}].desc`, val)} isEditMode={editMode} />
 
                         <div className="project-action-buttons">
                           {proj.liveUrl && (
-                            <a className="project-btn primary" href={proj.liveUrl} target="_blank" rel="noopener noreferrer">
-                              Live Demo ↗
-                            </a>
+                            <EditableButton as="a" className="project-btn primary" href={proj.liveUrl} target="_blank" rel="noopener noreferrer" text="Live Demo ↗" onChange={(val) => updateData(`projects[${idx}].liveUrl`, val.href)} isEditMode={editMode} />
                           )}
                           {proj.githubUrl && (
-                            <a className="project-btn secondary" href={proj.githubUrl} target="_blank" rel="noopener noreferrer">
-                              Source Code ↗
-                            </a>
+                            <EditableButton as="a" className="project-btn secondary" href={proj.githubUrl} target="_blank" rel="noopener noreferrer" text="Source Code ↗" onChange={(val) => updateData(`projects[${idx}].githubUrl`, val.href)} isEditMode={editMode} />
                           )}
                         </div>
                       </div>
                     </div>
                     <div className="row-card-action">
-                      <button className="pill primary row-action-btn" onClick={() => openDialog({ eyebrow: proj.badge, title: proj.title, text: proj.desc })}>
-                        Details ↗
-                      </button>
+                      <EditableButton as="button" className="pill primary row-action-btn" text="Details ↗" onClick={() => !editMode && openDialog({ eyebrow: proj.badge, title: proj.title, text: proj.desc })} isEditMode={editMode} />
                     </div>
                   </div>
                 ))}
@@ -549,16 +543,20 @@ export default function App() {
 
                   <div className="trajectory-card glass">
                     <div className="trajectory-card-header">
-                      <span className="fest-eyebrow-badge">{edu.badge}</span>
-                      <span className="date-text" style={{ margin: 0 }}>🗓️ {edu.period}</span>
+                      <EditableText tag="span" className="fest-eyebrow-badge" value={edu.badge} onChange={(val) => updateData(`education[${idx}].badge`, val)} isEditMode={editMode} />
+                      <EditableText tag="span" className="date-text" style={{ margin: 0 }} value={`🗓️ ${edu.period}`} onChange={(val) => updateData(`education[${idx}].period`, val.replace('🗓️ ', ''))} isEditMode={editMode} />
                     </div>
 
-                    <h2 className="trajectory-degree">{edu.degree}</h2>
-                    <div className="trajectory-institution">🏛️ {edu.institution}</div>
-                    <p className="trajectory-desc">{edu.desc}</p>
+                    <h2 className="trajectory-degree">
+                      <EditableText tag="span" value={edu.degree} onChange={(val) => updateData(`education[${idx}].degree`, val)} isEditMode={editMode} />
+                    </h2>
+                    <div className="trajectory-institution">
+                      <EditableText tag="span" value={`🏛️ ${edu.institution}`} onChange={(val) => updateData(`education[${idx}].institution`, val.replace('🏛️ ', ''))} isEditMode={editMode} />
+                    </div>
+                    <EditableText tag="p" className="trajectory-desc" value={edu.desc} onChange={(val) => updateData(`education[${idx}].desc`, val)} isEditMode={editMode} />
 
                     <div className="trajectory-footer">
-                      <span className="badge-tag accent">{edu.field}</span>
+                      <EditableText tag="span" className="badge-tag accent" value={edu.field} onChange={(val) => updateData(`education[${idx}].field`, val)} isEditMode={editMode} />
                     </div>
                   </div>
                 </div>
@@ -592,19 +590,22 @@ export default function App() {
 
                     <div
                       className="trajectory-card glass"
-                      onClick={() => openDialog({ eyebrow: cert.issuer, title: cert.title, text: cert.desc })}
-                      style={{ cursor: 'pointer' }}
+                      onClick={() => !editMode && openDialog({ eyebrow: cert.issuer, title: cert.title, text: cert.desc })}
+                      style={{ cursor: editMode ? 'default' : 'pointer' }}
                     >
                       <div className="trajectory-card-header">
-                        <span className="fest-eyebrow-badge">{cert.badge}</span>
+                        <EditableText tag="span" className="fest-eyebrow-badge" value={cert.badge} onChange={(val) => updateData(`certifications[${idx}].badge`, val)} isEditMode={editMode} />
                         <span className="badge-tag accent">VERIFIED CERTIFICATE</span>
                       </div>
 
-                      <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)' }}>
-                        {cert.icon} {cert.title}
+                      <h2 className="trajectory-degree" style={{ fontSize: 'clamp(20px, 3.2vw, 26px)', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <EditableText tag="span" value={cert.icon} onChange={(val) => updateData(`certifications[${idx}].icon`, val)} isEditMode={editMode} />
+                        <EditableText tag="span" value={cert.title} onChange={(val) => updateData(`certifications[${idx}].title`, val)} isEditMode={editMode} />
                       </h2>
-                      <div className="trajectory-institution">📜 {cert.issuer}</div>
-                      <p className="trajectory-desc">{cert.desc}</p>
+                      <div className="trajectory-institution">
+                        <EditableText tag="span" value={`📜 ${cert.issuer}`} onChange={(val) => updateData(`certifications[${idx}].issuer`, val.replace('📜 ', ''))} isEditMode={editMode} />
+                      </div>
+                      <EditableText tag="p" className="trajectory-desc" value={cert.desc} onChange={(val) => updateData(`certifications[${idx}].desc`, val)} isEditMode={editMode} />
 
                       <div className="trajectory-footer">
                         <span style={{ fontSize: '12.5px', color: '#0284c7', fontWeight: '700' }}>Click to view credential details ↗</span>
