@@ -86,3 +86,31 @@
   from { opacity: 0; transform: translate(-50%, 20px); }
   to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+/* Live editor command bar */
+.editor-command-bar { position: fixed; left: 50%; bottom: 24px; z-index: 10000; display: flex; align-items: center; gap: 12px; width: min(760px, calc(100% - 28px)); padding: 10px 12px 10px 16px; border: 1px solid rgba(244, 63, 94, 0.28); border-radius: 20px; background: linear-gradient(120deg, rgba(255, 248, 250, 0.98), rgba(255, 255, 255, 0.96) 46%, rgba(255, 246, 247, 0.98)); box-shadow: 0 18px 48px rgba(127, 29, 29, 0.16), 0 2px 0 rgba(255, 255, 255, 0.9) inset; backdrop-filter: blur(18px) saturate(150%); animation: editorBarIn 0.42s cubic-bezier(0.16, 1, 0.3, 1); }
+.editor-command-status { display: grid; min-width: 166px; gap: 2px; padding-right: 6px; }
+.editor-command-title { display: inline-flex; align-items: center; gap: 7px; color: #be123c; font-size: 12px; font-weight: 850; letter-spacing: 0.02em; }
+.editor-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #f43f5e; box-shadow: 0 0 0 4px rgba(244, 63, 94, 0.12); animation: editorPulse 1.8s ease-in-out infinite; }
+.editor-command-message { color: #64748b; font-size: 10.5px; font-weight: 650; white-space: nowrap; }
+.editor-history-controls, .editor-save-controls { display: flex; align-items: center; gap: 6px; }
+.editor-history-controls { padding: 3px; border: 1px solid rgba(148, 163, 184, 0.22); border-radius: 13px; background: rgba(248, 250, 252, 0.82); }
+.editor-command-bar button { border: 0; cursor: pointer; font: inherit; font-size: 12px; font-weight: 800; transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, color 0.18s ease, opacity 0.18s ease; }
+.editor-command-bar button:not(:disabled):hover { transform: translateY(-2px); }
+.editor-command-bar button:not(:disabled):active { transform: translateY(0) scale(0.97); }
+.editor-history-btn { display: inline-flex; align-items: center; gap: 5px; min-height: 34px; padding: 0 10px; border-radius: 10px !important; background: transparent; color: #475569; }
+.editor-history-btn > span:first-child { font-size: 17px; line-height: 1; }
+.editor-history-btn:not(:disabled):hover { background: #ffffff; color: #be123c; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1); }
+.editor-history-btn:disabled { cursor: not-allowed; opacity: 0.36; }
+.editor-save-controls { margin-left: auto; }
+.editor-save-btn, .editor-save-exit-btn, .editor-exit-btn { min-height: 38px; padding: 0 13px; border-radius: 11px !important; }
+.editor-save-btn { background: linear-gradient(135deg, #fb7185, #e11d48); color: #ffffff; box-shadow: 0 5px 14px rgba(225, 29, 72, 0.22); }
+.editor-save-btn:not(:disabled):hover { box-shadow: 0 9px 20px rgba(225, 29, 72, 0.32); }
+.editor-save-exit-btn { background: linear-gradient(135deg, #be123c, #881337); color: #ffffff; box-shadow: 0 5px 14px rgba(136, 19, 55, 0.22); }
+.editor-save-exit-btn:not(:disabled):hover { box-shadow: 0 9px 20px rgba(136, 19, 55, 0.32); }
+.editor-exit-btn { border: 1px solid rgba(14, 165, 233, 0.25) !important; background: rgba(240, 249, 255, 0.9); color: #0284c7; }
+.editor-exit-btn:hover { background: #e0f2fe; box-shadow: 0 7px 16px rgba(2, 132, 199, 0.16); }
+@keyframes editorBarIn { from { opacity: 0; transform: translate(-50%, 18px) scale(0.97); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@keyframes editorPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.72); opacity: 0.65; } }
+@media (max-width: 720px) { .editor-command-bar { bottom: 12px; flex-wrap: wrap; gap: 8px; border-radius: 18px; padding: 11px; } .editor-command-status { min-width: 0; width: 100%; } .editor-command-message { white-space: normal; } .editor-save-controls { margin-left: auto; } .editor-history-btn, .editor-save-btn, .editor-save-exit-btn, .editor-exit-btn { padding: 0 9px; } }
+@media (max-width: 440px) { .editor-history-btn > span:last-child { display: none; } .editor-save-exit-btn { display: none; } }
