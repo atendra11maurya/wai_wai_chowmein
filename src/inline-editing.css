@@ -43,8 +43,23 @@
 }
 
 .editable-popover {
+  z-index: 2000 !important;
   box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keep an open inline editor above adjacent cards instead of clipping it. */
+[data-editor-control="true"]:has(.editable-popover) {
+  position: relative;
+  z-index: 2000;
+}
+
+.tile:has(.editable-popover),
+.team-card:has(.editable-popover),
+.event-item-card:has(.editable-popover),
+.experience-card:has(.editable-popover) {
+  overflow: visible;
+  z-index: 1000;
 }
 
 .floating-save-bar {
