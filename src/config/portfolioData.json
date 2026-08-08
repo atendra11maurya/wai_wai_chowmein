@@ -16,7 +16,11 @@
     "summary": "Enthusiastic and highly motivated individual with a diverse background in internships across various domains, including AI, blockchain, open source contribution, energy saving, and leadership. Passionate about tackling real-world challenges and finding innovative solutions through technology.",
     "contactEyebrow": "Connect & Collaborate",
     "contactTitle": "Get in touch.",
-    "contactText": "Feel free to reach out to Abhijeet Vardhan for software development opportunities, AI projects, or research collaborations."
+    "contactText": "Feel free to reach out to Abhijeet Vardhan for software development opportunities, AI projects, or research collaborations.",
+    "avatarSize": {
+      "width": 435,
+      "height": 661
+    }
   },
   "impactMetrics": [
     {
