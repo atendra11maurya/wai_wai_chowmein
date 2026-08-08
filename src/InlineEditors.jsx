@@ -86,38 +86,85 @@ function TopLeftResizer({ targetRef, onResize }) {
 export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, className, style, placeholder, ...props }) {
   const elemRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
-  
+  const [isFocused, setIsFocused] = useState(false);
+  const [textAlign, setTextAlign] = useState(style?.textAlign || 'left');
+  const [toolbarPosition, setToolbarPosition] = useState(null);
+
+  const updateToolbarPosition = () => {
+    const rect = elemRef.current?.getBoundingClientRect();
+    if (rect) setToolbarPosition({ top: Math.max(8, rect.top - 8), left: rect.left + rect.width / 2 });
+  };
+
   useEffect(() => {
-    if (elemRef.current && document.activeElement !== elemRef.current) {
-      elemRef.current.textContent = value || '';
-    }
+    if (elemRef.current && document.activeElement !== elemRef.current) elemRef.current.textContent = value || '';
   }, [value]);
 
+  useEffect(() => {
+    if (!isFocused) return;
+    updateToolbarPosition();
+    window.addEventListener('resize', updateToolbarPosition);
+    window.addEventListener('scroll', updateToolbarPosition, true);
+    return () => {
+      window.removeEventListener('resize', updateToolbarPosition);
+      window.removeEventListener('scroll', updateToolbarPosition, true);
+    };
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (!isEditMode) return;
+    const clearSelectionOnEmptyClick = (event) => {
+      if (!elemRef.current?.contains(event.target) && !event.target.closest?.('[data-editor-control="true"]')) {
+        elemRef.current?.blur();
+        setIsFocused(false);
+      }
+    };
+    document.addEventListener('pointerdown', clearSelectionOnEmptyClick, true);
+    return () => document.removeEventListener('pointerdown', clearSelectionOnEmptyClick, true);
+  }, [isEditMode]);
+
   const handleBlur = (e) => {
-    const newVal = e.currentTarget.textContent;
-    if (newVal !== value) {
-      onChange(newVal);
-    }
+    setIsFocused(false);
+    const newVal = e.currentTarget.innerText;
+    if (newVal !== value) onChange(newVal);
   };
 
   const handleKeyDown = (e) => {
-    // Prevent line breaks for inline elements like span, h1-h6
-    if (e.key === 'Enter' && Tag !== 'p' && Tag !== 'div') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      e.target.blur();
+      document.execCommand('insertLineBreak');
     }
+  };
+
+  const handleAlignment = (alignment) => {
+    setTextAlign(alignment);
+    if (elemRef.current) elemRef.current.style.textAlign = alignment;
   };
 
   return (
     <>
       {isEditMode && isHovered && <TopLeftResizer targetRef={elemRef} />}
+      {isEditMode && isFocused && toolbarPosition && createPortal(
+        <div className="text-alignment-toolbar" data-editor-control="true" style={{ position: 'fixed', top: toolbarPosition.top, left: toolbarPosition.left, transform: 'translate(-50%, -100%)', zIndex: 100000 }} role="toolbar" aria-label="Text alignment">
+          {[
+            ['left', '≡', 'Align left'],
+            ['center', '≡', 'Align center'],
+            ['right', '≡', 'Align right']
+          ].map(([alignment, icon, label]) => (
+            <button key={alignment} type="button" className={textAlign === alignment ? 'active' : ''} aria-label={label} aria-pressed={textAlign === alignment} title={label} onMouseDown={(event) => event.preventDefault()} onClick={() => handleAlignment(alignment)} style={{ textAlign: alignment }}>
+              {icon}
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
       <Tag
         ref={elemRef}
-        className={`${className || ''} ${isEditMode ? 'editable-text' : ''}`}
-        style={style}
+        className={(className || '') + (isEditMode ? ' editable-text' : '')}
+        style={{ ...style, textAlign, whiteSpace: 'pre-wrap' }}
         contentEditable={isEditMode}
         suppressContentEditableWarning={true}
         onBlur={isEditMode ? handleBlur : undefined}
+        onFocus={isEditMode ? () => { setIsFocused(true); updateToolbarPosition(); } : undefined}
         onKeyDown={isEditMode ? handleKeyDown : undefined}
         onMouseEnter={() => isEditMode && setIsHovered(true)}
         onMouseLeave={() => isEditMode && setIsHovered(false)}
@@ -287,4 +334,41 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
       , document.body)}
     </div>
   );
+}
+
+/* Document-style text editor controls */
+.text-alignment-toolbar {
+  display: inline-flex;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid rgba(15, 23, 42, 0.14);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  backdrop-filter: blur(10px);
+}
+.text-alignment-toolbar button {
+  width: 30px;
+  height: 28px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #475569;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  transition: background .16s ease, color .16s ease, transform .16s ease;
+}
+.text-alignment-toolbar button:hover {
+  background: #f1f5f9;
+  color: #0284c7;
+  transform: translateY(-1px);
+}
+.text-alignment-toolbar button.active {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+.editable-text {
+  white-space: pre-wrap;
 }
