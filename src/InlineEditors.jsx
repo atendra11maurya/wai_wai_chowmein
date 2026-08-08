@@ -156,6 +156,7 @@ export function EditableImage({ src, alt, className, style, onChange, onResize, 
   return (
     <div 
       ref={wrapperRef} 
+      data-editor-control="true"
       className={`editable-img-wrapper ${isEditMode ? 'editable-hover' : ''}`} 
       style={{ position: 'relative', display: 'inline-block', ...style }}
       onMouseEnter={() => isEditMode && setIsHovered(true)}
@@ -227,6 +228,7 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
   return (
     <div 
       ref={buttonRef}
+      data-editor-control="true"
       style={{ position: 'relative', display: 'inline-block' }}
       onMouseEnter={() => isEditMode && setIsHovered(true)}
       onMouseLeave={() => isEditMode && setIsHovered(false)}
