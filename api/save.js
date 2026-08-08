@@ -1,4 +1,12 @@
 import { Octokit } from 'octokit';
+import { timingSafeEqual } from 'node:crypto';
+
+function passwordMatches(supplied, expected) {
+  if (typeof supplied !== 'string' || typeof expected !== 'string') return false;
+  const suppliedBuffer = Buffer.from(supplied);
+  const expectedBuffer = Buffer.from(expected);
+  return suppliedBuffer.length === expectedBuffer.length && timingSafeEqual(suppliedBuffer, expectedBuffer);
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -8,6 +16,18 @@ export default async function handler(req, res) {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
     return res.status(500).json({ error: 'GITHUB_TOKEN is not set in environment variables.' });
+  }
+
+  const editorPassword = process.env.EDITOR_PASSWORD;
+  if (!editorPassword) {
+    return res.status(503).json({ error: 'Editor authentication is not configured.' });
+  }
+  if (!passwordMatches(req.headers['x-editor-password'], editorPassword)) {
+    return res.status(401).json({ error: 'Unauthorized.' });
+  }
+
+  if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body) || !req.body.personal) {
+    return res.status(400).json({ error: 'Invalid portfolio data.' });
   }
 
   const owner = 'atendra11maurya';
@@ -31,7 +51,13 @@ export default async function handler(req, res) {
       }
     }
 
-    const content = Buffer.from(JSON.stringify(req.body, null, 2)).toString('base64');
+    const portfolioData = JSON.parse(JSON.stringify(req.body));
+    delete portfolioData.personal.adminPassword;
+    const serializedData = JSON.stringify(portfolioData, null, 2);
+    if (Buffer.byteLength(serializedData, 'utf8') > 3 * 1024 * 1024) {
+      return res.status(413).json({ error: 'Portfolio data is too large to publish.' });
+    }
+    const content = Buffer.from(serializedData).toString('base64');
 
     await octokit.rest.repos.createOrUpdateFileContents({
       owner,

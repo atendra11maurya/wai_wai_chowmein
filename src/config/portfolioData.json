@@ -12,7 +12,6 @@
     "linkedin": "https://www.linkedin.com/in/abhijeetvardhan-98276222b",
     "github": "https://github.com/abhijeetvardhan",
     "resumeUrl": "/Abhijeet_Vardhan_Resume.pdf",
-    "adminPassword": "4545amber5454",
     "summary": "Enthusiastic and highly motivated individual with a diverse background in internships across various domains, including AI, blockchain, open source contribution, energy saving, and leadership. Passionate about tackling real-world challenges and finding innovative solutions through technology.",
     "contactEyebrow": "Connect & Collaborate",
     "contactTitle": "Get in touch.",
@@ -22,6 +21,7 @@
       "height": 473
     }
   },
+  "editorLayout": {},
   "impactMetrics": [
     {
       "label": "Experience Roles",
@@ -90,18 +90,21 @@
   ],
   "testimonials": [
     {
+      "id": "research-mentor",
       "quote": "Abhijeet displayed exceptional technical curiosity and commitment during research projects. His ability to connect AI theory with practical implementations is commendable.",
       "author": "Research Mentor",
       "title": "IIT Research Faculty / Project Supervisor",
       "avatar": "🏛️"
     },
     {
+      "id": "hcl-manager",
       "quote": "Strong analytical mindset, quick adaptability in application engineering, and great team collaboration skills during his software development responsibilities.",
       "author": "Senior Manager",
       "title": "HCLTech Technical Team",
       "avatar": "💼"
     },
     {
+      "id": "program-coordinator",
       "quote": "Extremely proactive in driving campus outreach and student engagement initiatives across IITM Research Park and university networks.",
       "author": "Program Coordinator",
       "title": "GUVI Geek Networks & Outreach",
@@ -110,6 +113,7 @@
   ],
   "certifications": [
     {
+      "id": "product-matters",
       "title": "Product Matters 3.0",
       "issuer": "Industry Product Certification",
       "icon": "📦",
@@ -117,6 +121,7 @@
       "desc": "Product Strategy, roadmap planning, user research, and Agile product development frameworks."
     },
     {
+      "id": "generative-ai",
       "title": "Generative AI for Everyone",
       "issuer": "DeepLearning.AI",
       "icon": "🤖",
@@ -124,6 +129,7 @@
       "desc": "Foundations of Large Language Models (LLMs), prompt engineering techniques, AI ethics, and real-world GenAI deployment."
     },
     {
+      "id": "breast-cancer-svm",
       "title": "Breast Cancer Prediction using SVM",
       "issuer": "Machine Learning Research",
       "icon": "🩺",
@@ -131,6 +137,7 @@
       "desc": "Supervised Learning classification model using Support Vector Machines for clinical medical diagnostics."
     },
     {
+      "id": "strategy-sustainability",
       "title": "Strategy and Sustainability",
       "issuer": "Executive Certification",
       "icon": "🌿",
@@ -138,6 +145,7 @@
       "desc": "Sustainable business practices, ESG strategies, and eco-friendly technology implementation."
     },
     {
+      "id": "environmental-management",
       "title": "Global Environmental Management",
       "issuer": "International Certification",
       "icon": "🌍",
@@ -363,6 +371,7 @@
   ],
   "education": [
     {
+      "id": "iiit-delhi-pgd",
       "badge": "POSTGRADUATE DIPLOMA · IIIT DELHI",
       "degree": "Post-Graduate Diploma in Data Science in Health & Climate Change for Social Impact",
       "field": "AI & DATA SCIENCE RESEARCH",
@@ -371,6 +380,7 @@
       "desc": "Specialized postgraduate research program integrating Machine Learning models, health data analytics, predictive epidemiology, and climate impact forecasting."
     },
     {
+      "id": "du-bsc-cs",
       "badge": "BACHELOR DEGREE · UNIVERSITY OF DELHI",
       "degree": "Bachelor's Degree in Computer Science",
       "field": "B.Sc. COMPUTER SCIENCE",
@@ -381,6 +391,7 @@
   ],
   "projects": [
     {
+      "id": "breast-cancer-svm",
       "title": "Breast Cancer Prediction using Support Vector Machines",
       "category": "AI & Healthcare ML Project",
       "desc": "Supervised Machine Learning classification pipeline built with Python and Scikit-learn using Support Vector Classifier (SVC) to detect malignant tumors with high statistical accuracy.",
@@ -390,6 +401,7 @@
       "githubUrl": "https://github.com/abhijeetvardhan"
     },
     {
+      "id": "energy-hybrid-iit-ropar",
       "title": "Energy Hybrid System Research @ IIT Ropar AWaDH",
       "category": "Clean Energy & IoT Systems",
       "desc": "Research project analyzing hybrid renewable energy grids, battery management systems, and IoT data telemetry for clean energy conversion.",
@@ -399,6 +411,7 @@
       "githubUrl": "https://github.com/abhijeetvardhan"
     },
     {
+      "id": "full-stack-architecture",
       "title": "Full-Stack Web & Debugging Architecture @ Code Alpha & HCLTech",
       "category": "Web Development & Application Engineering",
       "desc": "Responsive web applications engineered with modern JavaScript frameworks, API integrations, and robust debugging tools for client services.",
@@ -408,6 +421,7 @@
       "githubUrl": "https://github.com/abhijeetvardhan"
     },
     {
+      "id": "student-upskilling",
       "title": "Pan-India Student Upskilling & Ambassador Programs",
       "category": "Tech Outreach & Community Leadership",
       "desc": "Organized tech skill initiatives reaching over 1k+ students across GUVI IITM Research Park, IIM Bangalore Vista, and IEEE IGDTUW.",
