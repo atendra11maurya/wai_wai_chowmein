@@ -114,3 +114,10 @@
 @keyframes editorPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(0.72); opacity: 0.65; } }
 @media (max-width: 720px) { .editor-command-bar { bottom: 12px; flex-wrap: wrap; gap: 8px; border-radius: 18px; padding: 11px; } .editor-command-status { min-width: 0; width: 100%; } .editor-command-message { white-space: normal; } .editor-save-controls { margin-left: auto; } .editor-history-btn, .editor-save-btn, .editor-save-exit-btn, .editor-exit-btn { padding: 0 9px; } }
 @media (max-width: 440px) { .editor-history-btn > span:last-child { display: none; } .editor-save-exit-btn { display: none; } }
+
+/* Document-style text editor controls */
+.text-alignment-toolbar { display: inline-flex; gap: 3px; padding: 4px; border: 1px solid rgba(15, 23, 42, 0.14); border-radius: 10px; background: rgba(255, 255, 255, 0.98); box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); backdrop-filter: blur(10px); }
+.text-alignment-toolbar button { width: 30px; height: 28px; border: 0; border-radius: 7px; background: transparent; color: #475569; cursor: pointer; font-size: 18px; font-weight: 900; line-height: 1; transition: background .16s ease, color .16s ease, transform .16s ease; }
+.text-alignment-toolbar button:hover { background: #f1f5f9; color: #0284c7; transform: translateY(-1px); }
+.text-alignment-toolbar button.active { background: #e0f2fe; color: #0369a1; }
+.editable-text { white-space: pre-wrap; }
