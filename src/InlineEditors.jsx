@@ -43,17 +43,17 @@ function TopLeftResizer({ targetRef, onResize }) {
       const dy = startY - moveEvent.clientY;
       target.style.width = `${startWidth + dx}px`;
       target.style.height = `${startHeight + dy}px`;
-    };
-
-    const handleMouseUp = () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
       if (onResize) {
         onResize({
           width: Math.round(target.getBoundingClientRect().width),
           height: Math.round(target.getBoundingClientRect().height)
         });
       }
+    };
+
+    const handleMouseUp = () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
 
     document.addEventListener('mousemove', handleMouseMove);
