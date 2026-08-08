@@ -337,7 +337,14 @@ export default function App() {
 
             {/* Standalone Equal Full-Width Hero Action Buttons */}
             <div className="hero-actions-standalone">
-              <button className="pill hero-primary-btn" onClick={() => navigateToTab('experience')}>Explore 12+ Experiences →</button>
+              <EditableButton
+                as="button"
+                className="pill hero-primary-btn"
+                text={portfolioData.personal.heroExploreText || 'Explore 12+ Experiences →'}
+                onChange={(val) => updateData('personal.heroExploreText', val.text)}
+                onClick={() => navigateToTab('experience')}
+                isEditMode={editMode}
+              />
               <EditableButton 
                 as="a" 
                 className="pill glass" 
@@ -359,9 +366,14 @@ export default function App() {
                 onChange={(val) => updateData('personal.linkedin', val.href)}
                 isEditMode={editMode} 
               />
-              <button className="pill glass" onClick={() => openDialog()}>
-                Get in Touch ✉️
-              </button>
+              <EditableButton
+                as="button"
+                className="pill glass"
+                text={portfolioData.personal.heroContactText || 'Get in Touch ✉️'}
+                onChange={(val) => updateData('personal.heroContactText', val.text)}
+                onClick={() => openDialog()}
+                isEditMode={editMode}
+              />
             </div>
 
 
@@ -369,13 +381,11 @@ export default function App() {
             <section className="fest-container-card glass">
               <div className="fest-header">
                 <div className="fest-header-top">
-                  <span className="fest-eyebrow-badge">FLAGSHIP ACHIEVEMENTS</span>
-                  <span className="badge-tag accent">TOP HIGHLIGHTS ONLY</span>
+                  <EditableText tag="span" className="fest-eyebrow-badge" value={portfolioData.personal.achievementsEyebrow || 'FLAGSHIP ACHIEVEMENTS'} onChange={(val) => updateData('personal.achievementsEyebrow', val)} isEditMode={editMode} />
+                  <EditableText tag="span" className="badge-tag accent" value={portfolioData.personal.achievementsTag || 'TOP HIGHLIGHTS ONLY'} onChange={(val) => updateData('personal.achievementsTag', val)} isEditMode={editMode} />
                 </div>
-                <h2>Major Career & Research Achievements</h2>
-                <p className="fest-subtitle">
-                  Here are the top flagship milestones of my career. For full details on all 12 internships, education, and certifications, explore the respective tabs above.
-                </p>
+                <EditableText tag="h2" value={portfolioData.personal.achievementsTitle || 'Major Career & Research Achievements'} onChange={(val) => updateData('personal.achievementsTitle', val)} isEditMode={editMode} />
+                <EditableText tag="p" className="fest-subtitle" value={portfolioData.personal.achievementsIntro || 'Here are the top flagship milestones of my career. For full details on all 12 internships, education, and certifications, explore the respective tabs above.'} onChange={(val) => updateData('personal.achievementsIntro', val)} isEditMode={editMode} />
               </div>
 
               <div className="fest-sub-rows">
@@ -384,6 +394,7 @@ export default function App() {
                     key={item.id}
                     className="fest-row-card glass"
                     onClick={() => {
+                      if (editMode) return
                       if (item.id === 'hcl') navigateToTab('experience')
                       else if (item.id === 'iit') navigateToTab('experience')
                       else if (item.id === 'iiit') navigateToTab('education')
@@ -423,10 +434,10 @@ export default function App() {
             <section className="fest-container-card glass" style={{ marginTop: '32px' }}>
               <div className="fest-header">
                 <div className="fest-header-top">
-                  <span className="fest-eyebrow-badge">RECOMMENDATIONS & FEEDBACK</span>
-                  <span className="badge-tag accent">VERIFIED SOCIAL PROOF</span>
+                  <EditableText tag="span" className="fest-eyebrow-badge" value={portfolioData.personal.testimonialsEyebrow || 'RECOMMENDATIONS & FEEDBACK'} onChange={(val) => updateData('personal.testimonialsEyebrow', val)} isEditMode={editMode} />
+                  <EditableText tag="span" className="badge-tag accent" value={portfolioData.personal.testimonialsTag || 'VERIFIED SOCIAL PROOF'} onChange={(val) => updateData('personal.testimonialsTag', val)} isEditMode={editMode} />
                 </div>
-                <h2>What Mentors & Leaders Say</h2>
+                <EditableText tag="h2" value={portfolioData.personal.testimonialsTitle || 'What Mentors & Leaders Say'} onChange={(val) => updateData('personal.testimonialsTitle', val)} isEditMode={editMode} />
               </div>
 
               <div className="testimonials-grid">
@@ -452,8 +463,8 @@ export default function App() {
             {/* Call to Action Banner on Home */}
             <section className="wide glass" style={{ marginTop: '32px' }}>
               <div>
-                <p className="eyebrow">Explore Complete Track Record</p>
-                <h2>Check out all 12+ roles, projects, and certifications.</h2>
+                <EditableText tag="p" className="eyebrow" value={portfolioData.personal.trackRecordEyebrow || 'Explore Complete Track Record'} onChange={(val) => updateData('personal.trackRecordEyebrow', val)} isEditMode={editMode} />
+                <EditableText tag="h2" value={portfolioData.personal.trackRecordTitle || 'Check out all 12+ roles, projects, and certifications.'} onChange={(val) => updateData('personal.trackRecordTitle', val)} isEditMode={editMode} />
               </div>
               <div className="wide-actions">
                 <button className="pill primary" onClick={() => navigateToTab('experience')}>View All Experiences →</button>
@@ -471,7 +482,7 @@ export default function App() {
                 ← Back to Home
               </button>
               <p className="eyebrow">Professional Track Record · {portfolioData.experiences.length} Roles</p>
-              <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Work & Research Internships.</h1>
+              <EditableText tag="h1" style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }} value={portfolioData.personal.experienceTitle || 'Work & Research Internships.'} onChange={(val) => updateData('personal.experienceTitle', val)} isEditMode={editMode} />
               <p className="intro" style={{ marginTop: '12px' }}>
                 Complete breakdown of my internships, software engineering positions, IIT research projects, and campus ambassador roles.
               </p>
@@ -549,8 +560,8 @@ export default function App() {
               <button className="pill glass" style={{ width: 'fit-content', marginBottom: '16px' }} onClick={() => navigateToTab('home')}>
                 ← Back to Home
               </button>
-              <p className="eyebrow">Innovations & Engineering</p>
-              <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Featured Projects & Research.</h1>
+              <EditableText tag="p" className="eyebrow" value={portfolioData.personal.projectsEyebrow || 'Innovations & Engineering'} onChange={(val) => updateData('personal.projectsEyebrow', val)} isEditMode={editMode} />
+              <EditableText tag="h1" style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }} value={portfolioData.personal.projectsTitle || 'Featured Projects & Research.'} onChange={(val) => updateData('personal.projectsTitle', val)} isEditMode={editMode} />
               <p className="intro" style={{ marginTop: '12px' }}>
                 Healthcare AI diagnostic models, clean energy hybrid systems at IIT Ropar, and full-stack web applications.
               </p>
@@ -594,8 +605,8 @@ export default function App() {
               <button className="pill glass" style={{ width: 'fit-content', marginBottom: '16px' }} onClick={() => navigateToTab('home')}>
                 ← Back to Home
               </button>
-              <p className="eyebrow">Academic Progression</p>
-              <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Educational Trajectory.</h1>
+              <EditableText tag="p" className="eyebrow" value={portfolioData.personal.educationEyebrow || 'Academic Progression'} onChange={(val) => updateData('personal.educationEyebrow', val)} isEditMode={editMode} />
+              <EditableText tag="h1" style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }} value={portfolioData.personal.educationTitle || 'Educational Trajectory.'} onChange={(val) => updateData('personal.educationTitle', val)} isEditMode={editMode} />
               <p className="intro" style={{ marginTop: '12px' }}>
                 Chronological higher education pathway progressing from undergraduate Computer Science at University of Delhi to postgraduate AI & Data Science research at IIIT Delhi.
               </p>
@@ -640,8 +651,8 @@ export default function App() {
               <button className="pill glass" style={{ width: 'fit-content', marginBottom: '16px' }} onClick={() => navigateToTab('home')}>
                 ← Back to Home
               </button>
-              <p className="eyebrow">Technical Competencies</p>
-              <h1 style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }}>Top Skills & Certifications.</h1>
+              <EditableText tag="p" className="eyebrow" value={portfolioData.personal.skillsEyebrow || 'Technical Competencies'} onChange={(val) => updateData('personal.skillsEyebrow', val)} isEditMode={editMode} />
+              <EditableText tag="h1" style={{ fontSize: 'clamp(32px, 5.5vw, 56px)' }} value={portfolioData.personal.skillsTitle || 'Top Skills & Certifications.'} onChange={(val) => updateData('personal.skillsTitle', val)} isEditMode={editMode} />
               <p className="intro" style={{ marginTop: '12px' }}>
                 Verified certifications in Product Strategy, Generative AI (DeepLearning.AI), Healthcare Machine Learning, and Sustainability.
               </p>
