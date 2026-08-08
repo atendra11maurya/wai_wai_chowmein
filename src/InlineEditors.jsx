@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 
 import { createPortal } from 'react-dom';
 
-function TopLeftResizer({ targetRef }) {
+function TopLeftResizer({ targetRef, onResize }) {
   const [rect, setRect] = useState(null);
 
   useEffect(() => {
@@ -48,6 +48,12 @@ function TopLeftResizer({ targetRef }) {
     const handleMouseUp = () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      if (onResize) {
+        onResize({
+          width: Math.round(target.getBoundingClientRect().width),
+          height: Math.round(target.getBoundingClientRect().height)
+        });
+      }
     };
 
     document.addEventListener('mousemove', handleMouseMove);
@@ -122,7 +128,7 @@ export function EditableText({ tag: Tag = 'span', value, onChange, isEditMode, c
   );
 }
 
-export function EditableImage({ src, alt, className, style, onChange, isEditMode }) {
+export function EditableImage({ src, alt, className, style, onChange, onResize, isEditMode }) {
   const [isOpen, setIsOpen] = useState(false);
   const [inputVal, setInputVal] = useState(src);
   const [isHovered, setIsHovered] = useState(false);
@@ -155,7 +161,7 @@ export function EditableImage({ src, alt, className, style, onChange, isEditMode
       onMouseEnter={() => isEditMode && setIsHovered(true)}
       onMouseLeave={() => isEditMode && setIsHovered(false)}
     >
-      {isEditMode && isHovered && <TopLeftResizer targetRef={wrapperRef} />}
+      {isEditMode && isHovered && <TopLeftResizer targetRef={wrapperRef} onResize={onResize} />}
       <img 
         src={src} 
         alt={alt} 
