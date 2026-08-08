@@ -91,6 +91,23 @@ export default function App() {
     portfolioDataRef.current = portfolioData
   }, [portfolioData])
 
+  const savedDataRef = useRef(JSON.parse(JSON.stringify(portfolioData)))
+  const editHistoryRef = useRef([JSON.parse(JSON.stringify(portfolioData))])
+  const historyIndexRef = useRef(0)
+  const [historyIndex, setHistoryIndex] = useState(0)
+  const [historyLength, setHistoryLength] = useState(1)
+
+  const clonePortfolioData = (data) => JSON.parse(JSON.stringify(data))
+  const dataHasUnsavedChanges = (data) => JSON.stringify(data) !== JSON.stringify(savedDataRef.current)
+
+  const resetEditHistory = (data) => {
+    const snapshot = clonePortfolioData(data)
+    editHistoryRef.current = [snapshot]
+    historyIndexRef.current = 0
+    setHistoryIndex(0)
+    setHistoryLength(1)
+  }
+
   // Admin Login Authentication State
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false)
   const [adminInputPassword, setAdminInputPassword] = useState('')
@@ -115,6 +132,9 @@ export default function App() {
       setIsAdminLoggedIn(true)
       setPasswordError(false)
       setEditMode(true)
+      resetEditHistory(portfolioDataRef.current)
+      setUnsavedChanges(dataHasUnsavedChanges(portfolioDataRef.current))
+      setSaveStatus('')
       setActiveTab('home') // Switch immediately to home to start editing
     } else {
       setPasswordError(true)
@@ -122,18 +142,43 @@ export default function App() {
   }
 
   const updateData = (path, value) => {
-    const newData = JSON.parse(JSON.stringify(portfolioDataRef.current));
-    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.');
-    let current = newData;
-    for (let i = 0; i < keys.length - 1; i++) {
-      current = current[keys[i]];
-    }
-    current[keys[keys.length - 1]] = value;
-    portfolioDataRef.current = newData;
-    setPortfolioData(newData);
-    setUnsavedChanges(true);
-    setSaveStatus('Unsaved changes')
+    const newData = clonePortfolioData(portfolioDataRef.current)
+    const keys = path.replace(/\[(\d+)\]/g, '.$1').split('.')
+    let current = newData
+    for (let i = 0; i < keys.length - 1; i++) current = current[keys[i]]
+    current[keys[keys.length - 1]] = value
+
+    const nextHistory = editHistoryRef.current.slice(0, historyIndexRef.current + 1).concat([clonePortfolioData(newData)])
+    if (nextHistory.length > 60) nextHistory.shift()
+    editHistoryRef.current = nextHistory
+    historyIndexRef.current = nextHistory.length - 1
+    setHistoryIndex(nextHistory.length - 1)
+    setHistoryLength(nextHistory.length)
+
+    portfolioDataRef.current = newData
+    setPortfolioData(newData)
+    const isDirty = dataHasUnsavedChanges(newData)
+    setUnsavedChanges(isDirty)
+    setSaveStatus(isDirty ? 'Unsaved changes' : 'All changes saved')
   }
+
+  const handleHistoryChange = (direction) => {
+    const nextIndex = historyIndexRef.current + direction
+    if (nextIndex < 0 || nextIndex >= editHistoryRef.current.length) return
+
+    const nextData = clonePortfolioData(editHistoryRef.current[nextIndex])
+    historyIndexRef.current = nextIndex
+    portfolioDataRef.current = nextData
+    setHistoryIndex(nextIndex)
+    setPortfolioData(nextData)
+
+    const isDirty = dataHasUnsavedChanges(nextData)
+    setUnsavedChanges(isDirty)
+    setSaveStatus(isDirty ? (direction < 0 ? 'Undid last change' : 'Redid change') : 'All changes saved')
+  }
+
+  const handleUndo = () => handleHistoryChange(-1)
+  const handleRedo = () => handleHistoryChange(1)
 
   const [isSaving, setIsSaving] = useState(false)
 
@@ -160,6 +205,7 @@ export default function App() {
         return false
       } else {
         console.log('Save successful:', result.message);
+        savedDataRef.current = clonePortfolioData(dataToSave)
         setUnsavedChanges(false)
         setSaveStatus('Saved. The live site will update after deployment finishes.')
         return true
@@ -176,22 +222,18 @@ export default function App() {
 
   const handleExitEditMode = () => {
     const saved = localStorage.getItem('userPortfolioData')
+    let savedData = defaultPortfolioData
     if (saved) {
-      try {
-        const savedData = JSON.parse(saved)
-        portfolioDataRef.current = savedData
-        setPortfolioData(savedData)
-      } catch {
-        portfolioDataRef.current = defaultPortfolioData
-        setPortfolioData(defaultPortfolioData)
-      }
-    } else {
-      portfolioDataRef.current = defaultPortfolioData
-      setPortfolioData(defaultPortfolioData)
+      try { savedData = JSON.parse(saved) } catch { savedData = defaultPortfolioData }
     }
+    portfolioDataRef.current = savedData
+    savedDataRef.current = clonePortfolioData(savedData)
+    setPortfolioData(savedData)
+    resetEditHistory(savedData)
     setEditMode(false)
     setIsAdminLoggedIn(false)
     setUnsavedChanges(false)
+    setSaveStatus('')
   }
 
   const openDialog = (customData = null) => {
@@ -715,41 +757,23 @@ export default function App() {
         />
       )}
 
-      {/* Floating Save Bar for Edit Mode */}
+      {/* Live editor command bar */}
       {editMode && (
-        <div className="floating-save-bar glass" style={{ background: 'rgba(255, 255, 255, 0.95)', border: '2px solid rgba(239, 68, 68, 0.5)', boxShadow: '0 0 20px rgba(239, 68, 68, 0.3)' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', marginRight: '16px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 'bold', color: '#ef4444' }}>Live Edit Mode Active</span>
-            <span style={{ fontSize: '11px', color: '#64748b' }}>{saveStatus || 'Changes are not published until you save'}</span>
+        <aside className="floating-save-bar editor-command-bar" aria-label="Live edit controls">
+          <div className="editor-command-status">
+            <span className="editor-command-title"><span className="editor-status-dot" aria-hidden="true"></span>Live editor</span>
+            <span className="editor-command-message" aria-live="polite">{saveStatus || 'Changes are not published until you save'}</span>
           </div>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <button 
-              className="pill primary" 
-              onClick={handleSaveData} 
-              style={{ background: '#ef4444', opacity: (unsavedChanges && !isSaving) ? 1 : 0.5 }}
-              disabled={!unsavedChanges || isSaving}
-            >
-              {isSaving ? 'Pushing...' : 'Save'}
-            </button>
-            <button 
-              className="pill primary" 
-              onClick={async () => { 
-                if (unsavedChanges && !(await handleSaveData())) return
-                handleExitEditMode()
-              }}
-              style={{ background: '#b91c1c', opacity: isSaving ? 0.5 : 1 }}
-              disabled={isSaving}
-            >
-              {isSaving ? 'Pushing...' : 'Save & Exit'}
-            </button>
-            <button 
-              className="pill glass" 
-              onClick={handleExitEditMode}
-            >
-              Exit
-            </button>
+          <div className="editor-history-controls" aria-label="Change history">
+            <button className="editor-history-btn" type="button" onClick={handleUndo} disabled={historyIndex === 0} title="Undo last edit" aria-label="Undo last edit"><span aria-hidden="true">↶</span><span>Undo</span></button>
+            <button className="editor-history-btn" type="button" onClick={handleRedo} disabled={historyIndex >= historyLength - 1} title="Redo last edit" aria-label="Redo last edit"><span aria-hidden="true">↷</span><span>Redo</span></button>
           </div>
-        </div>
+          <div className="editor-save-controls">
+            <button className="editor-save-btn" type="button" onClick={handleSaveData} disabled={!unsavedChanges || isSaving}>{isSaving ? 'Pushing…' : 'Save'}</button>
+            <button className="editor-save-exit-btn" type="button" onClick={async () => { if (unsavedChanges && !(await handleSaveData())) return; handleExitEditMode() }} disabled={isSaving}>{isSaving ? 'Pushing…' : 'Save & Exit'}</button>
+            <button className="editor-exit-btn" type="button" onClick={handleExitEditMode}>Exit</button>
+          </div>
+        </aside>
       )}
     </div>
   )
