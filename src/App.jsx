@@ -323,7 +323,12 @@ export default function App() {
                     src={portfolioData.personal.avatarImage} 
                     alt={`${portfolioData.personal.name} Avatar`} 
                     className="hero-avatar-3d" 
+                    style={portfolioData.personal.avatarSize ? {
+                      width: `${portfolioData.personal.avatarSize.width}px`,
+                      height: `${portfolioData.personal.avatarSize.height}px`
+                    } : undefined}
                     onChange={(val) => updateData('personal.avatarImage', val)}
+                    onResize={(size) => updateData('personal.avatarSize', size)}
                     isEditMode={editMode} 
                   />
                 </div>
