@@ -21,7 +21,11 @@
       "height": 473
     }
   },
-  "editorLayout": {},
+  "editorLayout": {
+    "home_hero_name": {
+      "hidden": true
+    }
+  },
   "impactMetrics": [
     {
       "label": "Experience Roles",
