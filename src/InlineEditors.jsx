@@ -191,6 +191,7 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
   const [inputText, setInputText] = useState(text || '');
   const [inputHref, setInputHref] = useState(href || '');
   const [isHovered, setIsHovered] = useState(false);
+  const [popoverPosition, setPopoverPosition] = useState(null);
   const buttonRef = useRef(null);
 
   useEffect(() => {
@@ -198,11 +199,32 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
     setInputHref(href || '');
   }, [text, href]);
 
+  const updatePopoverPosition = () => {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (rect) {
+      setPopoverPosition({ top: rect.bottom + 8, left: rect.left + rect.width / 2 });
+    }
+  };
+
+  useEffect(() => {
+    if (!isOpen) return;
+    updatePopoverPosition();
+    window.addEventListener('resize', updatePopoverPosition);
+    window.addEventListener('scroll', updatePopoverPosition, true);
+    return () => {
+      window.removeEventListener('resize', updatePopoverPosition);
+      window.removeEventListener('scroll', updatePopoverPosition, true);
+    };
+  }, [isOpen]);
+
   const handleClick = (e) => {
     if (isEditMode) {
       e.preventDefault();
       e.stopPropagation();
-      setIsOpen(!isOpen);
+      setIsOpen((open) => {
+        if (!open) updatePopoverPosition();
+        return !open;
+      });
     } else if (props.onClick) {
       props.onClick(e);
     }
@@ -244,8 +266,8 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
         {text || children}
       </Component>
       
-      {isOpen && isEditMode && (
-        <div className="editable-popover glass" style={{ position: 'absolute', top: '100%', left: '50%', transform: 'translateX(-50%)', marginTop: '8px', zIndex: 100, minWidth: '220px', padding: '12px' }}>
+      {isOpen && isEditMode && popoverPosition && createPortal(
+        <div data-editor-control="true" className="editable-popover glass" style={{ position: 'fixed', top: popoverPosition.top, left: popoverPosition.left, transform: 'translateX(-50%)', zIndex: 100000, minWidth: '220px', padding: '12px' }}>
           <p style={{ margin: '0 0 8px', fontSize: '12px', fontWeight: 'bold' }}>Edit Action</p>
           <input type="text" value={inputText} onChange={(e) => setInputText(e.target.value)} placeholder="Label Text" className="form-input" style={{ marginBottom: '6px', fontSize: '12px', padding: '8px' }} />
           {isLink && (
@@ -262,7 +284,7 @@ export function EditableButton({ as: Component = 'button', text, href, onChange,
             <button className="pill glass" style={{ flex: 1, padding: '6px', minHeight: 'auto', fontSize: '13px' }} onClick={() => setIsOpen(false)}>Cancel</button>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 }
